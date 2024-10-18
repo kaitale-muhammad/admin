@@ -1,0 +1,105 @@
+<template>
+  <div class="main">
+    <VCard
+      width="400px"
+      class="card"
+      align-center
+      elevation="true"
+      border="red">
+      <VForm @submit.prevent="">
+        {{ id }}
+        <input type="text" v-model="form.service_name" />
+        <input type="text" v-model="form.file" />
+        <input type="text" v-model="form.description" />
+        <input type="text" v-model="form.status" />
+
+        <v-btn class="mt-2" type="submit" color="primary" block>Edit</v-btn>
+      </VForm>
+    </VCard>
+  </div>
+</template>
+
+<script setup>
+import { ref, reactive, onMounted } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import axios from "axios";
+import { useToast } from "vue-toastification";
+
+const form = reactive({
+  service_name: "",
+  file: "",
+  description: "",
+  status: "",
+});
+
+const state = reactive({
+  job: {},
+  isLoading: true,
+});
+
+const route = useRoute();
+const router = useRouter();
+const id = route.params.id;
+
+const toast = useToast();
+
+// const name = ref("");
+// name.value = "My name";
+
+onMounted(async () => {
+  const id = route.params.id;
+  //id = id.toString().split("/")[1];
+  try {
+    const response = await axios
+      .get(`http://localhost:5000/services/` + id)
+      .then((res) => {
+        console.log(res.data);
+        console.log(response.data);
+      });
+
+    state.job = response.data;
+
+    // const d = response.data[0].service_name;
+    // console.log(d);
+
+    // inputs
+    // toast.error("Mounted");
+    if (response.data[0].id == id) {
+      form.service_name = response.data[0].service_name;
+      form.file = state.job.file;
+      form.description = state.job.description;
+      form.status = state.job.status;
+    }
+    console.log("failed");
+  } catch (err) {
+    console.log(err);
+  }
+});
+</script>
+
+<style scoped>
+input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid blue;
+  border-radius: 5px;
+  outline: 1px solid blue;
+  margin-bottom: 10px;
+}
+
+.form {
+  align-items: center;
+  justify-content: center;
+}
+
+.main {
+  justify-content: center;
+  align-items: center;
+  justify-items: center;
+  display: flex;
+  margin-top: 50px;
+}
+div .card {
+  padding: 20px;
+}
+</style>
