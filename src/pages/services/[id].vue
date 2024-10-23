@@ -45,7 +45,7 @@ const toast = useToast();
 
 // const name = ref("");
 // name.value = "My name";
-
+const jobs=ref([]);
 onMounted(async () => {
  
   try {
