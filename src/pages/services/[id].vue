@@ -47,30 +47,21 @@ const toast = useToast();
 // name.value = "My name";
 
 onMounted(async () => {
-  const id = route.params.id;
-  //id = id.toString().split("/")[1];
+ 
   try {
-    const response = await axios
-      .get(`http://localhost:5000/services/` + id)
-      .then((res) => {
-        console.log(res.data);
-        console.log(response.data);
-      });
+    const response = await axios.get(`http://localhost:5000/services/` + id);
 
-    state.job = response.data;
-
-    // const d = response.data[0].service_name;
-    // console.log(d);
-
-    // inputs
-    // toast.error("Mounted");
-    if (response.data[0].id == id) {
-      form.service_name = response.data[0].service_name;
-      form.file = state.job.file;
-      form.description = state.job.description;
-      form.status = state.job.status;
-    }
-    console.log("failed");
+    jobs.value=response.data
+    console.log(response.data);
+    
+    
+    // if (response.data[0].id == id) {
+    //   form.service_name = response.data[0].service_name;
+    //   form.file = state.job.file;
+    //   form.description = state.job.description;
+    //   form.status = state.job.status;
+    // }
+   
   } catch (err) {
     console.log(err);
   }
