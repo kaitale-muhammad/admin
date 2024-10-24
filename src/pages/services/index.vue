@@ -23,11 +23,10 @@
             <v-icon
               icon="mdi-delete"
               pa="7"
-              @click="deleteUser(item.id)"
-            ></v-icon>
+              @click="deleteUser(item.id)"></v-icon>
 
-            <router-link :to="`/${item.id}`">
-              <v-icon icon="mdi-pencil" pa="7" @click="getEditPath"> </v-icon>
+            <router-link :to="`/services/${item.id}`">
+              <v-icon icon="mdi-pencil" pa="7"> </v-icon>
             </router-link>
           </td>
         </tr>

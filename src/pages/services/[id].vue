@@ -6,14 +6,34 @@
       align-center
       elevation="true"
       border="red">
-      <VForm @submit.prevent="">
+      <VForm @submit.prevent="submitForm">
         {{ id }}
-        <input type="text" v-model="form.service_name" />
-        <input type="text" v-model="form.file" />
-        <input type="text" v-model="form.description" />
-        <input type="text" v-model="form.status" />
+        <input
+          type="text"
+          v-model="form.service_name"
+          placeholder="Service Name" />
+        <div class="image">
+          <VAvatar :image="'http://localhost:5000/imgs/' + form.file"></VAvatar
+          ><input
+            type="file"
+            v-on:change="handleFileChange"
+            placeholder="File" />
+        </div>
 
-        <v-btn class="mt-2" type="submit" color="primary" block>Edit</v-btn>
+        <input
+          type="text"
+          v-model="form.description"
+          placeholder="Description" />
+        <input type="text" v-model="form.status" placeholder="Status" />
+
+        <v-btn
+          class="mt-2"
+          :disabled="loading"
+          type="submit"
+          color="primary"
+          block>
+          {{ loading ? "loading..." : "Edit" }}
+        </v-btn>
       </VForm>
     </VCard>
   </div>
@@ -21,7 +41,7 @@
 
 <script setup>
 import { ref, reactive, onMounted } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { useRoute } from "vue-router";
 import axios from "axios";
 import { useToast } from "vue-toastification";
 
@@ -32,49 +52,66 @@ const form = reactive({
   status: "",
 });
 
-const state = reactive({
-  job: {},
-  isLoading: true,
-});
-
+const loading = ref(false);
 const route = useRoute();
-const router = useRouter();
 const id = route.params.id;
-
 const toast = useToast();
-
-// const name = ref("");
-// name.value = "My name";
-
-onMounted(async () => {
-  const id = route.params.id;
-  //id = id.toString().split("/")[1];
+async function fetch() {
   try {
-    const response = await axios
-      .get(`http://localhost:5000/services/` + id)
-      .then((res) => {
-        console.log(res.data);
-        console.log(response.data);
-      });
+    const response = await axios.get(`http://localhost:5000/services/${id}`);
+    var data = response.data;
 
-    state.job = response.data;
-
-    // const d = response.data[0].service_name;
-    // console.log(d);
-
-    // inputs
-    // toast.error("Mounted");
-    if (response.data[0].id == id) {
-      form.service_name = response.data[0].service_name;
-      form.file = state.job.file;
-      form.description = state.job.description;
-      form.status = state.job.status;
-    }
-    console.log("failed");
+    form.service_name = data.service_name || "kk";
+    form.file = data.image || "";
+    form.description = data.descripton || "";
+    form.status = data.status || "";
   } catch (err) {
-    console.log(err);
+    console.error(err);
+    toast.error("Failed to load service details");
   }
+}
+const filedata = ref("");
+const handleFileChange = (event) => {
+  const file = event.target.files[0];
+  if (file) {
+    filedata.value = file;
+  }
+};
+onMounted(async () => {
+  fetch();
 });
+const submitForm = async () => {
+  loading.value = true;
+  try {
+    const formData = new FormData();
+    formData.append("service_name", form.service_name);
+    formData.append("description", form.description);
+    formData.append("status", form.status);
+    formData.append("image", form.file);
+
+    if (filedata.value) {
+      formData.append("file", filedata.value); // Append the file if present
+    }
+
+    // Make the API request to submit the form with the file
+    const response = await axios.put(
+      `http://localhost:5000/services/${id}`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+    loading.value = false;
+    toast.success("Service updated successfully!");
+    fetch();
+  } catch (error) {
+    loading.value = false;
+    console.error(error);
+    toast.error("Failed to update the service");
+  }
+};
 </script>
 
 <style scoped>
@@ -83,23 +120,22 @@ input {
   padding: 10px;
   border: 1px solid blue;
   border-radius: 5px;
-  outline: 1px solid blue;
+  outline: none;
   margin-bottom: 10px;
 }
 
-.form {
-  align-items: center;
-  justify-content: center;
-}
-
 .main {
+  display: flex;
   justify-content: center;
   align-items: center;
-  justify-items: center;
-  display: flex;
   margin-top: 50px;
 }
-div .card {
+
+.card {
   padding: 20px;
+}
+.image {
+  display: flex;
+  gap: 5px;
 }
 </style>
