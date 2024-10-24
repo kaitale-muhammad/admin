@@ -90,10 +90,9 @@ const submitForm = async () => {
     formData.append("image", form.file);
 
     if (filedata.value) {
-      formData.append("file", filedata.value); // Append the file if present
+      formData.append("file", filedata.value);
     }
 
-    // Make the API request to submit the form with the file
     const response = await axios.put(
       `http://localhost:5000/services/${id}`,
       formData,
