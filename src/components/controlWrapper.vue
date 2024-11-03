@@ -7,46 +7,29 @@
             v-bind="activatorProps"
             prepend-icon="mdi-plus"
             color="green"
-            text="add Service"
+            text="add Control Room"
           ></v-btn>
         </template>
 
         <template v-slot:default="{ isActive }">
           <v-card align-center>
-            <v-toolbar title="Add a Service"></v-toolbar>
+            <v-toolbar title="Add Control Room"></v-toolbar>
 
             <v-form @submit.prevent="submitForm" class="pa-4 form">
               <input
                 type="text"
-                v-model="form.service_name"
-                placeholder="Service Name"
-                name="service_name"
-                id="service_name"
+                v-model="form.name"
+                placeholder="Name"
+                name="by"
+                id="by"
               /><br />
-              <input type="file" ref="file" @change="handleFileChange" /><br />
-              <textarea
-                type="text"
-                v-model="form.description"
-                placeholder="Description"
-                name="description"
-                required
-              ></textarea
-              ><br />
               <input
                 type="text"
-                v-model="form.status"
-                name="status"
-                id="statuss"
-                placeholder="Status"
+                v-model="form.contact"
+                placeholder="Contact"
+                name="by"
+                id="by"
               /><br />
-
-              <!-- <div>
-                <v-checkbox
-                  label="Featured"
-                  v-model="check"
-                  value="1"
-                ></v-checkbox>
-              </div> -->
 
               <v-btn
                 class="mt-2"
@@ -54,7 +37,7 @@
                 color="primary"
                 @click="isActive.value = false"
                 block
-                >{{ editing ? "Update" : "Add" }}</v-btn
+                >Add</v-btn
               >
             </v-form>
 
@@ -77,12 +60,12 @@
 
     <!-- <slot /> -->
     <!-- {{ service_name }}
-    {{ image }}
-    {{ description }} -->
+                {{ image }}
+                {{ description }} -->
   </div>
   <!-- <div v-for="data in data" :key="data.id">
-    {{ data.service_name }}
-  </div> -->
+                {{ data.service_name }}
+              </div> -->
 </template>
 
 <style scoped>
@@ -131,76 +114,24 @@ const toast = useToast();
 
 const editing = false;
 
-defineProps({
-  fetch: Function,
-  data: {
-    type: Object,
-    default: "Nothing",
-  },
-});
-
 const form = reactive({
-  service_name: "",
-  file: "",
-  description: "",
-  status: "",
-});
-const check = ref(false);
-
-onMounted(() => {
-  fetch();
+  name: "",
+  contact: "",
 });
 
-const filedata = ref("");
-const handleFileChange = (event) => {
-  const file = event.target.files[0];
-  if (file) {
-    filedata.value = file;
-  }
-};
+// control_id, name, contact
 
 const submitForm = async () => {
   loading.value = true;
   try {
-    const formData = new FormData();
-    formData.append("service_name", form.service_name);
-    formData.append("description", form.description);
-    formData.append("status", form.status);
-    formData.append("image", form.file);
-
-    if (filedata.value) {
-      formData.append("file", filedata.value);
-    }
-
-    const response = await axios.post(
-      `http://localhost:5000/addservices`,
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
-    );
+    await axios.post(`http://localhost:5000/controls`, form);
     loading.value = false;
-    toast.success("Service added successfully!");
+    toast.success("News added successfully!");
     // isActive.value = false;
-    fetch();
   } catch (error) {
     loading.value = false;
     console.error(error);
-    toast.error("Failed to add the service");
+    toast.error("Failed to add the news");
   }
 };
-
-// const onSubmit = async () => {
-//   const formData = new FormData();
-//   formData.append("file", this.file);
-
-//   try {
-//     await axios.post("http://localhost:5000/uploads", formData);
-//     this.message = "Uploaded Successsfully";
-//   } catch (err) {
-//     this.message = err.response.data.error;
-//   }
-// };
 </script>

@@ -7,21 +7,21 @@
             v-bind="activatorProps"
             prepend-icon="mdi-plus"
             color="green"
-            text="add Service"
+            text="add Tip"
           ></v-btn>
         </template>
 
         <template v-slot:default="{ isActive }">
           <v-card align-center>
-            <v-toolbar title="Add a Service"></v-toolbar>
+            <v-toolbar title="Add Tips"></v-toolbar>
 
             <v-form @submit.prevent="submitForm" class="pa-4 form">
               <input
                 type="text"
-                v-model="form.service_name"
-                placeholder="Service Name"
-                name="service_name"
-                id="service_name"
+                v-model="form.title"
+                placeholder="Title"
+                name="title"
+                id="title"
               /><br />
               <input type="file" ref="file" @change="handleFileChange" /><br />
               <textarea
@@ -34,19 +34,11 @@
               ><br />
               <input
                 type="text"
-                v-model="form.status"
-                name="status"
-                id="statuss"
-                placeholder="Status"
+                v-model="form.by"
+                placeholder="Added By"
+                name="by"
+                id="by"
               /><br />
-
-              <!-- <div>
-                <v-checkbox
-                  label="Featured"
-                  v-model="check"
-                  value="1"
-                ></v-checkbox>
-              </div> -->
 
               <v-btn
                 class="mt-2"
@@ -54,7 +46,7 @@
                 color="primary"
                 @click="isActive.value = false"
                 block
-                >{{ editing ? "Update" : "Add" }}</v-btn
+                >Add</v-btn
               >
             </v-form>
 
@@ -77,12 +69,12 @@
 
     <!-- <slot /> -->
     <!-- {{ service_name }}
-    {{ image }}
-    {{ description }} -->
+            {{ image }}
+            {{ description }} -->
   </div>
   <!-- <div v-for="data in data" :key="data.id">
-    {{ data.service_name }}
-  </div> -->
+            {{ data.service_name }}
+          </div> -->
 </template>
 
 <style scoped>
@@ -131,21 +123,13 @@ const toast = useToast();
 
 const editing = false;
 
-defineProps({
-  fetch: Function,
-  data: {
-    type: Object,
-    default: "Nothing",
-  },
-});
-
 const form = reactive({
-  service_name: "",
+  title: "",
   file: "",
   description: "",
-  status: "",
+  by: "",
+  date_to_occur: "",
 });
-const check = ref(false);
 
 onMounted(() => {
   fetch();
@@ -163,32 +147,28 @@ const submitForm = async () => {
   loading.value = true;
   try {
     const formData = new FormData();
-    formData.append("service_name", form.service_name);
+    formData.append("title", form.title);
     formData.append("description", form.description);
-    formData.append("status", form.status);
     formData.append("image", form.file);
+    formData.append("added_by", form.by);
 
     if (filedata.value) {
       formData.append("file", filedata.value);
     }
 
-    const response = await axios.post(
-      `http://localhost:5000/addservices`,
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
-    );
+    const response = await axios.post(`http://localhost:5000/tips`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
     loading.value = false;
-    toast.success("Service added successfully!");
+    toast.success("News added successfully!");
     // isActive.value = false;
     fetch();
   } catch (error) {
     loading.value = false;
     console.error(error);
-    toast.error("Failed to add the service");
+    toast.error("Failed to add the news");
   }
 };
 
