@@ -4,7 +4,7 @@ import Vue from '@vitejs/plugin-vue'
 import Vuetify, { transformAssetUrls } from 'vite-plugin-vuetify'
 import ViteFonts from 'unplugin-fonts/vite'
 import VueRouter from 'unplugin-vue-router/vite'
-
+//import Pages from 'vite-plugin-pages';
 // Utilities
 import { defineConfig } from 'vite'
 import { fileURLToPath, URL } from 'node:url'
@@ -16,6 +16,10 @@ export default defineConfig({
     Vue({
       template: { transformAssetUrls }
     }),
+
+    // Pages({
+    //   dirs:'src/pages',
+    // }),
     // https://github.com/vuetifyjs/vuetify-loader/tree/master/packages/vite-plugin#readme
     Vuetify({
       autoImport: true,
