@@ -1,10 +1,9 @@
 <template>
-  <homeWraper :fetch="fetch" :data="data" />
-
+  <TipsWrapper />
   <v-card flat>
     <v-card-title class="d-flex align-center pe-2">
-      <v-icon icon="mdi-briefcase-outline"></v-icon> &nbsp;&nbsp;&nbsp; FIND
-      SERVICES&nbsp;&nbsp;&nbsp;&nbsp;
+      <v-icon icon="mdi-information-outline"></v-icon> &nbsp;&nbsp;&nbsp; FIND
+      TIPS&nbsp;&nbsp;&nbsp;&nbsp;
 
       <v-spacer></v-spacer>
 
@@ -27,31 +26,26 @@
       :items-per-page="3"
       :headers="headers"
     >
-      <!--  id, service_name, image, descripton, status, date_added, featured -->
-
-      <template #header.service_name>
-        <div class="text-start">Name</div>
-      </template>
-
+      <!-- tips_id, image, title, description, added_by, date_added -->
       <template #header.image>
         <div class="text-start">Image</div>
       </template>
+      <template #header.title>
+        <div class="text-start">Title</div>
+      </template>
 
-      <template #header.descripton>
+      <template #header.description>
         <div class="text-start">Description</div>
       </template>
       <!-- <template v-slot="header">
           {{ header.descripton }}
         </template> -->
 
-      <template #header.status>
-        <div class="text-start">Status</div>
+      <template #header.added_by>
+        <div class="text-start">Added By</div>
       </template>
       <template #header.date_added>
         <div class="text-start">Date Added</div>
-      </template>
-      <template #header.actions>
-        <div class="text-start">Actions</div>
       </template>
 
       <template #item.actions="{ item }">
@@ -62,12 +56,12 @@
               pa="7"
               color="red"
               class="icon"
-              @click="deleteService(item.id)"
+              @click="deleteTip(item.tips_id)"
             ></v-icon>
           </div>
 
           <div class="edit">
-            <router-link :to="`/services/${item.id}`">
+            <router-link :to="`/tips/${item.tips_id}`">
               <v-icon icon="mdi-pencil" pa="7" class="icon" color="blue">
               </v-icon>
             </router-link>
@@ -86,48 +80,38 @@
       </template>
     </v-data-table>
   </v-card>
-  <!-- <img src="http://127.0.0.1:5000/imgs/1729795792504-78609318-contact_us.png" /> -->
 </template>
 
 <script setup>
-import homeWraper from "@/components/homeWraper.vue";
-import { useDataStore } from "@/stores/dataStore";
-
+import TipsWrapper from "@/components/tipsWrapper.vue";
 import axios from "axios";
 import { onMounted, ref, defineProps } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useToast } from "vue-toastification";
 
 const loading = ref(true);
-let data = ref(undefined);
 
 const toast = useToast();
 const route = useRoute();
-const id = route.params.id;
+const tips_id = route.params.id;
 
-const datastore = useDataStore();
-datastore.getServices();
 const search = ref("");
 const items = ref([]);
-// id, service_name, image, descripton, status, date_added, featured
+//news_id, image, title, description, added_by, date_added
 const headers = ref([
-  { text: "Name", value: "service_name" },
   { text: "Image", value: "image" },
-  { text: "Description", value: "descripton" },
-  { text: "Status", value: "status" },
+  { text: "Title", value: "title" },
+  { text: "Description", value: "description" },
+  { text: "Added By", value: "added_by" },
   { text: "Date Added", value: "date_added" },
+
   { text: "Actions", value: "actions" },
 ]);
 
-datastore.getServices().then(() => {
-  items.value = datastore.items;
-  loading.value = false;
-});
-
 const fetchData = async () => {
   try {
-    const response = await axios.get("http://localhost:5000/services");
-    items.value = response.data; // Assuming response data is an array of items
+    const response = await axios.get("http://localhost:5000/tips");
+    items.value = response.data;
   } catch (error) {
     console.error(error);
   } finally {
@@ -136,13 +120,13 @@ const fetchData = async () => {
 };
 
 // Fetch data when the component mounts
-// onMounted(fetchData);
+onMounted(fetchData);
 
-const deleteService = async (id) => {
+const deleteTip = async (tips_id) => {
   try {
     const confirm = window.confirm("Are you sure you want to delete");
     if (confirm) {
-      await axios.delete(`http://localhost:5000/services/${id}`).then(() => {
+      await axios.delete(`http://localhost:5000/tips/${tips_id}`).then(() => {
         console.log("deleted successfully");
         fetchData();
         toast.success("Deleted successfully");
@@ -161,7 +145,7 @@ const deleteService = async (id) => {
 .icon-container {
   display: flex;
   align-items: center;
-  gap: 8px; /* Space between icons */
+  gap: 8px;
 }
 
 .icon {
@@ -173,6 +157,6 @@ const deleteService = async (id) => {
 }
 
 .icon:hover {
-  background-color: rgba(0, 0, 0, 0.1); /* Darker on hover */
+  background-color: rgba(0, 0, 0, 0.1);
 }
 </style>

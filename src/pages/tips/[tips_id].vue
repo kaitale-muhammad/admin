@@ -9,7 +9,7 @@
             </v-avatar>
           </v-btn>
 
-          <b style="margin-left: 10px">{{ form.service_name }}</b
+          <b style="margin-left: 10px">{{ form.title }}</b
           ><br />
           <!-- chevron-left -->
         </div>
@@ -22,7 +22,7 @@
 
         {{ form.description }}<br /><br />
         <hr />
-        <b>Status: </b>{{ form.status }}
+        <b>By:</b> {{ form.added_by }} <br />
       </VCard>
     </div>
 
@@ -34,11 +34,9 @@
       border="red"
     >
       <VForm @submit.prevent="submitForm">
-        <input
-          type="text"
-          v-model="form.service_name"
-          placeholder="Service Name"
-        />
+        <!-- {{ notes_id }} -->
+
+        <input type="text" v-model="form.title" placeholder="Title" />
         <div class="image">
           <VAvatar :image="'http://localhost:5000/imgs/' + form.file"></VAvatar
           ><input
@@ -53,22 +51,7 @@
           v-model="form.description"
           placeholder="Description"
         ></textarea>
-        <input type="text" v-model="form.status" placeholder="Status" />
-
-        <div>
-          <!-- <input
-            type="checkbox"
-            v-model="form.featured"
-            :value="form.featured"
-          /> -->
-
-          <v-checkbox
-            label="Featured"
-            :onchange="checked"
-            v-model="form.featured"
-            value="1"
-          ></v-checkbox>
-        </div>
+        <input type="text" v-model="form.added_by" placeholder="Added By" />
 
         <v-btn
           class="mt-2"
@@ -92,41 +75,32 @@ import { useToast } from "vue-toastification";
 
 const router = useRouter();
 const form = reactive({
-  service_name: "",
+  title: "",
   file: "",
   description: "",
-  status: "",
-  featured: false,
+  added_by: "",
 });
 
 const back = () => {
   router.go(-1);
 };
 
-// const featured = ref(false);
-
-const checked = () => {
-  const check_value = form.featured;
-  console.log(check_value);
-};
-
 const loading = ref(false);
 const route = useRoute();
-const id = route.params.id;
+const tips_id = route.params.tips_id;
 const toast = useToast();
 async function fetch() {
   try {
-    const response = await axios.get(`http://localhost:5000/services/${id}`);
+    const response = await axios.get(`http://localhost:5000/tips/${tips_id}`);
     var data = response.data;
 
-    form.service_name = data.service_name || "kk";
+    form.title = data.title || "kk";
     form.file = data.image || "";
-    form.description = data.descripton || "";
-    form.status = data.status || "";
-    form.featured = data.featured || "";
+    form.description = data.description || "";
+    form.added_by = data.added_by || "";
   } catch (err) {
     console.error(err);
-    toast.error("Failed to load service details");
+    toast.error("Failed to load News");
   }
 }
 const filedata = ref("");
@@ -142,11 +116,12 @@ onMounted(async () => {
 const submitForm = async () => {
   loading.value = true;
   try {
+    //tips_id, image, title, description, added_by, date_added
     const formData = new FormData();
-    formData.append("service_name", form.service_name);
+    formData.append("title", form.title);
     formData.append("description", form.description);
-    formData.append("status", form.status);
-    formData.append("featured", form.featured);
+    formData.append("added_by", form.added_by);
+
     formData.append("image", form.file);
 
     if (filedata.value) {
@@ -154,7 +129,7 @@ const submitForm = async () => {
     }
 
     const response = await axios.put(
-      `http://localhost:5000/services/${id}`,
+      `http://localhost:5000/tips/${tips_id}`,
       formData,
       {
         headers: {
@@ -163,12 +138,12 @@ const submitForm = async () => {
       }
     );
     loading.value = false;
-    toast.success("Service updated successfully!");
+    toast.success("News updated successfully!");
     fetch();
   } catch (error) {
     loading.value = false;
     console.error(error);
-    toast.error("Failed to update the service");
+    toast.error("Failed to update the news");
   }
 };
 </script>
