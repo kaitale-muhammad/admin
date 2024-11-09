@@ -25,6 +25,7 @@
       :items="items"
       :items-per-page="3"
       :headers="headers"
+      hover
     >
       <!-- advert_id, image, description, added_by, date_added -->
       <template #header.image>
@@ -70,7 +71,7 @@
       </template>
 
       <template #item.image="{ item }">
-        <v-card class="my-2" elevation="2" rounded>
+        <v-card class="my-2" elevation="2" rounded style="width: 80px">
           <img
             :src="`http://localhost:5000/imgs/${item.image}`"
             width="80"

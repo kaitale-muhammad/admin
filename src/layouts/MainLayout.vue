@@ -4,7 +4,7 @@
       <v-list-item
         v-for="item in items"
         :key="item"
-        class="ma-2"
+        class="ma-1"
         link
         nav
         :prepend-icon="item.prependIcon"
@@ -20,6 +20,7 @@
           @click="logout"
           prepend-icon="mdi-logout"
           title="Logout"
+          style="height: 10px"
         />
       </template>
     </v-navigation-drawer>
@@ -45,9 +46,11 @@
               <v-list-item
                 append-icon="mdi-cog-outline"
                 link
+                @click="settings"
                 title="Settings"
               />
               <v-list-item
+                style="height: 50px"
                 @click="logout"
                 append-icon="mdi-logout"
                 link
@@ -75,7 +78,7 @@ const router = useRouter();
 const getPath = () => {
   const pathname = path.name;
   if (pathname == "/") return "Dashboard";
-  console.log(pathname?.split("/"));
+  //   console.log(pathname?.split("/"));
 
   var name = pathname?.split("/")[1];
   return name?.substring(0, 1).toUpperCase() + name?.substring(1, name.length);
@@ -84,7 +87,11 @@ const getPath = () => {
 const logout = () => {
   localStorage.removeItem("user"); // Remove user data from local storage
   router.push("/login");
-  console.log("logged Out");
+  //   console.log("logged Out");
+};
+
+const settings = () => {
+  router.push("/settings");
 };
 const drawer = ref(true);
 
@@ -103,6 +110,16 @@ const items = ref([
     title: "Users",
     prependIcon: "mdi-account-group",
     link: "/users",
+  },
+  {
+    title: "Workers",
+    prependIcon: "mdi-account-group",
+    link: "/workers",
+  },
+  {
+    title: "Clients",
+    prependIcon: "mdi-account-group",
+    link: "/clients",
   },
   {
     title: "Notes Board",

@@ -8,13 +8,11 @@
               <v-icon icon="mdi-arrow-left-thick" color="white"></v-icon>
             </v-avatar>
           </v-btn>
-
-          <!-- chevron-left -->
         </div>
 
-        <b>Control Room: </b> {{ form.name }}<br /><br />
+        <b>Email: </b> {{ form.email }}<br /><br />
         <hr />
-        <b>Contact:</b> {{ form.contact }} <br />
+        <b>Password:</b> ****** <br />
       </VCard>
     </div>
 
@@ -26,20 +24,19 @@
       border="red"
     >
       <VForm @submit.prevent="submitForm">
-        <!-- {{ notes_id }} -->
+        <input type="text" v-model="form.email" placeholder="Email" />
+        <input
+          type="password"
+          v-model="form.password"
+          placeholder="Current Password"
+        />
+        <input
+          type="password"
+          v-model="form.newpassword"
+          placeholder="New Password"
+        />
 
-        <input type="text" v-model="form.name" placeholder="Name" />
-        <input type="text" v-model="form.contact" placeholder="Contact" />
-
-        <v-btn
-          class="mt-2"
-          :disabled="loading"
-          type="submit"
-          color="primary"
-          block
-        >
-          {{ loading ? "loading..." : "Edit" }}
-        </v-btn>
+        <v-btn class="mt-2" type="submit" color="primary" block> Update </v-btn>
       </VForm>
     </VCard>
   </div>
@@ -53,43 +50,50 @@ import { useToast } from "vue-toastification";
 
 const router = useRouter();
 const form = reactive({
-  name: "",
-  contact: "",
+  email: "",
+  newpassword: "",
+  password: "",
 });
+const loading = ref(false);
+const toast = useToast();
 
 const back = () => {
   router.go(-1);
 };
-// control_id, name, contact
-const loading = ref(false);
-const route = useRoute();
-const control_id = route.params.control_id;
-const toast = useToast();
+
 async function fetch() {
   try {
-    const response = await axios.get(
-      `http://localhost:5000/controls/${control_id}`
-    );
-    var data = response.data;
+    const response = await axios.get("http://localhost:5000/admin");
+    const data = response.data;
 
-    form.name = data.name || "";
-    form.contact = data.contact || "";
+    form.email = data[0].email || "";
   } catch (err) {
     console.error(err);
-    toast.error("Failed to load Adverts");
+    toast.error("Failed to load admin");
   }
 }
 
-onMounted(async () => {
+onMounted(() => {
   fetch();
 });
+
 const submitForm = async () => {
   loading.value = true;
   try {
-    await axios.put(`http://localhost:5000/controls/${control_id}`, form);
-    loading.value = false;
-    toast.success("Updated successfully!");
-    fetch();
+    const response = await axios.get("http://localhost:5000/admin");
+    const data = response.data;
+
+    if (form.password === data[0].password) {
+      await axios.put("http://localhost:5000/admin", {
+        email: form.email,
+        newpassword: form.newpassword,
+      });
+      loading.value = false;
+      toast.success("Updated successfully!");
+      fetch();
+    } else {
+      toast.error("Wrong Password");
+    }
   } catch (error) {
     loading.value = false;
     console.error(error);

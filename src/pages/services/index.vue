@@ -26,6 +26,7 @@
       :items="items"
       :items-per-page="3"
       :headers="headers"
+      hover
     >
       <!--  id, service_name, image, descripton, status, date_added, featured -->
 
@@ -76,7 +77,7 @@
       </template>
 
       <template #item.image="{ item }">
-        <v-card class="my-2" elevation="2" rounded>
+        <v-card class="my-2" elevation="2" rounded style="width: 80px">
           <img
             :src="`http://localhost:5000/imgs/${item.image}`"
             width="80"
@@ -92,7 +93,7 @@
 <script setup>
 import homeWraper from "@/components/homeWraper.vue";
 import { useDataStore } from "@/stores/dataStore";
-
+import api from "@/axios";
 import axios from "axios";
 import { onMounted, ref, defineProps } from "vue";
 import { useRoute, useRouter } from "vue-router";
@@ -126,7 +127,7 @@ datastore.getServices().then(() => {
 
 const fetchData = async () => {
   try {
-    const response = await axios.get("http://localhost:5000/services");
+    const response = await api.get("/services");
     items.value = response.data; // Assuming response data is an array of items
   } catch (error) {
     console.error(error);

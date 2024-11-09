@@ -25,6 +25,7 @@
       :items="items"
       :items-per-page="3"
       :headers="headers"
+      hover
     >
       <!-- notes_id, image, title, description, date_added, added_by -->
       <template #header.image>
@@ -69,7 +70,7 @@
       </template>
 
       <template #item.image="{ item }">
-        <v-card class="my-2" elevation="2" rounded>
+        <v-card class="my-2" elevation="2" rounded style="width: 80px">
           <img
             :src="`http://localhost:5000/imgs/${item.image}`"
             width="80"

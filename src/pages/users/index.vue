@@ -18,42 +18,43 @@
     </v-card-title>
 
     <v-divider></v-divider>
-    <v-data-table v-model:search="search" :items="items">
-      <template v-slot:header.stock>
-        <div class="text-end">Stock</div>
+    <v-data-table
+      v-model:search="search"
+      :items="items"
+      :items-per-page="5"
+      :headers="headers"
+      hover
+    >
+      <!-- user_id, name, email, contact, profileImage, date_created -->
+      <template #header.profileImage>
+        <div class="text-start">Profile Image</div>
+      </template>
+      <template #header.name>
+        <div class="text-start">Name</div>
       </template>
 
-      <template v-slot:item.image="{ item }">
-        <v-card class="my-2" elevation="2" rounded>
-          <!-- <v-img :src="item.image" height="64" cover></v-img> -->
+      <template #header.contact>
+        <div class="text-start">Contact</div>
+      </template>
+      <template #header.email>
+        <div class="text-start">Email</div>
+      </template>
+      <!-- <template v-slot="header">
+        {{ header.descripton }}
+      </template> -->
+
+      <template #header.date_created>
+        <div class="text-start">Added Added</div>
+      </template>
+
+      <template #item.profileImage="{ item }">
+        <v-card class="my-2" elevation="2" rounded style="width: 60px">
           <img
-            :src="`http://localhost:5000/imgs/${item.image}`"
-            width="80"
-            height="80"
+            :src="`http://localhost:5000${item.profileImage}`"
+            width="60"
+            height="60"
           />
         </v-card>
-      </template>
-
-      <template v-slot:item.rating="{ item }">
-        <v-rating
-          :model-value="item.rating"
-          color="orange-darken-2"
-          density="compact"
-          size="small"
-          readonly
-        ></v-rating>
-      </template>
-
-      <template v-slot:item.stock="{ item }">
-        <div class="text-end">
-          <v-chip
-            :color="item.stock ? 'green' : 'red'"
-            :text="item.stock ? 'In stock' : 'Out of stock'"
-            class="text-uppercase"
-            size="small"
-            label
-          ></v-chip>
-        </div>
       </template>
     </v-data-table>
   </v-card>
@@ -67,9 +68,19 @@ const search = ref("");
 const items = ref([]);
 const loading = ref(true);
 
+//user_id, name, email, contact, profileImage, date_created
+const headers = ref([
+  { text: "Image", value: "profileImage" },
+  { text: "Name", value: "name" },
+  { text: "Contact", value: "contact" },
+  { text: "Email", value: "email" },
+  { text: "Date Added", value: "date_created" },
+]);
+
+// user_id, name, email, contact, profileImage, date_created
 const fetchData = async () => {
   try {
-    const response = await axios.get("http://localhost:5000/news");
+    const response = await axios.get("http://localhost:5000/allusers");
     items.value = response.data; // Assuming response data is an array of items
   } catch (error) {
     console.error(error);

@@ -126,12 +126,12 @@ const submitForm = async () => {
   try {
     await axios.post(`http://localhost:5000/controls`, form);
     loading.value = false;
-    toast.success("News added successfully!");
+    toast.success("Control room added successfully!");
     // isActive.value = false;
   } catch (error) {
     loading.value = false;
     console.error(error);
-    toast.error("Failed to add the news");
+    toast.error("Failed to add the Control Room");
   }
 };
 </script>

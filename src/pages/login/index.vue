@@ -1,6 +1,6 @@
 <template>
   <div class="main">
-    <VCard width="400px" class="card" align-center elevation="true">
+    <VCard width="400px" class="card" align-center elevation="2">
       <VForm @submit.prevent="login">
         <div class="image">
           <img src="@/assets/logo.jfif" height="100" />
@@ -49,17 +49,20 @@ const login = async () => {
       email: form.email,
       password: form.password,
     });
-
-    if (response.data.success) {
-      const user = { email: form.email, token: response.data.token };
-      localStorage.setItem("user", JSON.stringify(user));
-      toast.success("Login successful");
-      router.push({ path: "/" });
+    if ((form.email != "") | (form.password != "")) {
+      if (response.data.success) {
+        const user = { email: response.data.id, token: response.data.token };
+        localStorage.setItem("user", JSON.stringify(user));
+        toast.success("Login successful");
+        router.push({ path: "/" });
+      } else {
+        toast.error("Invalid credentials");
+      }
     } else {
-      toast.error("Invalid credentials");
+      toast.error("All fields are required");
     }
   } catch (error) {
-    toast.error("Error logging in");
+    toast.error("Invalid credentials");
   } finally {
     loading.value = false;
   }
