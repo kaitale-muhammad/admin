@@ -72,12 +72,59 @@
             ></v-icon>
           </div>
 
-          <div class="edit">
-            <router-link :to="`/workers/${item.id}`">
-              <v-icon icon="mdi-pencil" pa="7" class="icon" color="blue">
-              </v-icon>
-            </router-link>
-          </div>
+          <v-chip close>
+            <template #append>
+              <v-btn class="text-none me-2" height="48" icon slim>
+                <v-icon
+                  icon="mdi-dots-vertical"
+                  pa="7"
+                  class="icon"
+                  color="blue"
+                ></v-icon>
+
+                <v-menu activator="parent">
+                  <v-list density="compact" nav>
+                    <router-link :to="`/workers/${item.id}`">
+                      <v-list-item append-icon="mdi-pencil" link title="Edit" />
+                    </router-link>
+                    <!-- dialog -->
+                    <v-dialog transition="dialog-top-transition" pa-4>
+                      <template v-slot:activator="{ props: activatorProps }">
+                        <v-list-item
+                          v-bind="activatorProps"
+                          append-icon="mdi-pencil"
+                          link
+                          title="Attedance"
+                        />
+                      </template>
+
+                      <template v-slot:default="{ isActive }">
+                        <v-card align-center>
+                          <!-- <v-toolbar title="Add worker"></v-toolbar> -->
+                          <!-- id, image, worker_id, name, date_of_birth, contact, email, date_joined, site -->
+
+                          <div class="container">
+                            <UserAttendance :user-attendance-records="item" />
+                          </div>
+                          <v-card-actions class="justify-end">
+                            <v-btn
+                              class="text-white text-none rounded-md"
+                              color="red"
+                              rounded="0"
+                              variant="flat"
+                              @click="isActive.value = false"
+                            >
+                              Close
+                            </v-btn>
+                          </v-card-actions>
+                        </v-card>
+                      </template>
+                    </v-dialog>
+                  </v-list>
+                </v-menu>
+              </v-btn>
+            </template>
+          </v-chip>
         </div>
       </template>
 
@@ -100,6 +147,7 @@ import axios from "axios";
 import { onMounted, ref, defineProps } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useToast } from "vue-toastification";
+import UserAttendance from "../attendance/UserAttendance.vue";
 
 const loading = ref(true);
 
@@ -174,5 +222,9 @@ const path = useRoute();
 
 .icon:hover {
   background-color: rgba(0, 0, 0, 0.1);
+}
+.container {
+  height: 100%;
+  overflow-y: scroll;
 }
 </style>
