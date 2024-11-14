@@ -1,47 +1,60 @@
 <template>
   <div class="main">
-    <div class="content">
-      <VCard>
-        <div class="top">
-          <v-btn class="text-none me-2" @click="back" height="48" icon slim>
-            <v-avatar color="info">
-              <v-icon icon="mdi-arrow-left-thick" color="white"></v-icon>
-            </v-avatar>
-          </v-btn>
+    <v-container>
+      <v-row>
+        <v-col cols="12" md="6" lg="6">
+          <div class="content">
+            <VCard>
+              <div class="top">
+                <v-btn
+                  class="text-none me-2"
+                  @click="back"
+                  height="48"
+                  icon
+                  slim
+                >
+                  <v-avatar color="info">
+                    <v-icon icon="mdi-arrow-left-thick" color="white"></v-icon>
+                  </v-avatar>
+                </v-btn>
 
-          <!-- chevron-left -->
-        </div>
+                <!-- chevron-left -->
+              </div>
 
-        <b>Control Room: </b> {{ form.name }}<br /><br />
-        <hr />
-        <b>Contact:</b> {{ form.contact }} <br />
-      </VCard>
-    </div>
+              <b>Control Room: </b> {{ form.name }}<br /><br />
+              <hr />
+              <b>Contact:</b> {{ form.contact }} <br />
+            </VCard>
+          </div>
+        </v-col>
+        <v-col cols="12" md="6" lg="6">
+          <VCard
+            width="400px"
+            class="card"
+            align-center
+            elevation="true"
+            border="red"
+          >
+            <VForm @submit.prevent="submitForm">
+              <!-- {{ notes_id }} -->
 
-    <VCard
-      width="400px"
-      class="card"
-      align-center
-      elevation="true"
-      border="red"
-    >
-      <VForm @submit.prevent="submitForm">
-        <!-- {{ notes_id }} -->
+              <input type="text" v-model="form.name" placeholder="Name" />
+              <input type="text" v-model="form.contact" placeholder="Contact" />
 
-        <input type="text" v-model="form.name" placeholder="Name" />
-        <input type="text" v-model="form.contact" placeholder="Contact" />
-
-        <v-btn
-          class="mt-2"
-          :disabled="loading"
-          type="submit"
-          color="primary"
-          block
-        >
-          {{ loading ? "loading..." : "Edit" }}
-        </v-btn>
-      </VForm>
-    </VCard>
+              <v-btn
+                class="mt-2"
+                :disabled="loading"
+                type="submit"
+                color="primary"
+                block
+              >
+                {{ loading ? "loading..." : "Edit" }}
+              </v-btn>
+            </VForm>
+          </VCard>
+        </v-col>
+      </v-row>
+    </v-container>
   </div>
 </template>
 

@@ -2,8 +2,11 @@
   <WorkersWrapper />
   <v-card flat>
     <v-card-title class="d-flex align-center pe-2">
-      <v-icon icon="mdi-account-group"></v-icon> &nbsp;&nbsp;&nbsp; FIND
-      WORKER&nbsp;&nbsp;&nbsp;&nbsp;
+      <v-icon
+        icon="mdi-account-hard-hat-outline"
+        class="text-start font-weight-semibold text-primary"
+      ></v-icon>
+      &nbsp;&nbsp;&nbsp; FIND WORKER&nbsp;&nbsp;&nbsp;&nbsp;
 
       <v-spacer></v-spacer>
 
@@ -25,40 +28,48 @@
       :items="items"
       :items-per-page="4"
       :headers="headers"
+      class="elevation-1 my-4 custom-table"
       hover
+      dense
     >
       <!-- id, image, worker_id, name, date_of_birth, contact, email, date_joined, site -->
       <template #header.image>
-        <div class="text-start">Photo</div>
+        <div class="text-start font-weight-semibold text-primary">Photo</div>
       </template>
       <template #header.worker_id>
-        <div class="text-start">ID</div>
+        <div class="text-start font-weight-semibold text-primary">ID</div>
       </template>
 
       <template #header.name>
-        <div class="text-start">Name</div>
+        <div class="text-start font-weight-semibold text-primary">Name</div>
       </template>
 
       <template #header.date_of_birth>
-        <div class="text-start">DOB</div>
+        <div class="text-start font-weight-semibold text-primary">DOB</div>
       </template>
       <template #header.date_added>
-        <div class="text-start">Date Added</div>
+        <div class="text-start font-weight-semibold text-primary">
+          Date Added
+        </div>
       </template>
       <template #header.contact>
-        <div class="text-start">Contact</div>
+        <div class="text-start font-weight-semibold text-primary">Contact</div>
       </template>
       <template #header.email>
-        <div class="text-start">email</div>
+        <div class="text-start font-weight-semibold text-primary">email</div>
       </template>
       <template #header.date_joined>
-        <div class="text-start">Date joined</div>
+        <div class="text-start font-weight-semibold text-primary">
+          Date joined
+        </div>
       </template>
       <template #header.site>
-        <div class="text-start">Client ID</div>
+        <div class="text-start font-weight-semibold text-primary">
+          Client ID
+        </div>
       </template>
       <template #header.actions>
-        <div class="text-start">Actions</div>
+        <div class="text-start font-weight-semibold text-primary">Actions</div>
       </template>
       <template #item.actions="{ item }">
         <div class="icon-container">
@@ -68,63 +79,54 @@
               pa="7"
               color="red"
               class="icon"
-              @click="deleteEvent(item.id)"
+              @click="deleteWorker(item.id)"
             ></v-icon>
           </div>
 
-          <v-chip close>
-            <template #append>
-              <v-btn class="text-none me-2" height="48" icon slim>
-                <v-icon
-                  icon="mdi-dots-vertical"
-                  pa="7"
-                  class="icon"
-                  color="blue"
-                ></v-icon>
+          <v-btn class="text-none" icon small>
+            <v-icon icon="mdi-dots-vertical" color="blue" pa="7"></v-icon>
 
-                <v-menu activator="parent">
-                  <v-list density="compact" nav>
-                    <router-link :to="`/workers/${item.id}`">
-                      <v-list-item append-icon="mdi-pencil" link title="Edit" />
-                    </router-link>
-                    <!-- dialog -->
-                    <v-dialog transition="dialog-top-transition" pa-4>
-                      <template v-slot:activator="{ props: activatorProps }">
-                        <v-list-item
-                          v-bind="activatorProps"
-                          append-icon="mdi-pencil"
-                          link
-                          title="Attedance"
-                        />
-                      </template>
+            <!-- Menu for actions -->
+            <v-menu activator="parent">
+              <v-list density="compact" nav>
+                <!-- Edit option -->
+                <router-link class="edit" :to="`/workers/${item.id}`">
+                  <v-list-item append-icon="mdi-pencil" link title="Edit" />
+                </router-link>
 
-                      <template v-slot:default="{ isActive }">
-                        <v-card align-center>
-                          <!-- <v-toolbar title="Add worker"></v-toolbar> -->
-                          <!-- id, image, worker_id, name, date_of_birth, contact, email, date_joined, site -->
+                <!-- Dialog for Attendance -->
+                <v-dialog transition="dialog-top-transition" pa-4>
+                  <template v-slot:activator="{ props: activatorProps }">
+                    <v-list-item
+                      v-bind="activatorProps"
+                      append-icon="mdi-calendar"
+                      link
+                      title="Attendance"
+                    />
+                  </template>
 
-                          <div class="container">
-                            <UserAttendance :user-attendance-records="item" />
-                          </div>
-                          <v-card-actions class="justify-end">
-                            <v-btn
-                              class="text-white text-none rounded-md"
-                              color="red"
-                              rounded="0"
-                              variant="flat"
-                              @click="isActive.value = false"
-                            >
-                              Close
-                            </v-btn>
-                          </v-card-actions>
-                        </v-card>
-                      </template>
-                    </v-dialog>
-                  </v-list>
-                </v-menu>
-              </v-btn>
-            </template>
-          </v-chip>
+                  <template v-slot:default="{ isActive }">
+                    <v-card align-center>
+                      <div class="container">
+                        <UserAttendance :user-attendance-records="item" />
+                      </div>
+                      <v-card-actions class="justify-end">
+                        <v-btn
+                          class="text-white text-none rounded-md"
+                          color="red"
+                          rounded="0"
+                          variant="flat"
+                          @click="isActive.value = false"
+                        >
+                          Close
+                        </v-btn>
+                      </v-card-actions>
+                    </v-card>
+                  </template>
+                </v-dialog>
+              </v-list>
+            </v-menu>
+          </v-btn>
         </div>
       </template>
 
@@ -134,11 +136,25 @@
             :src="`http://localhost:5000/imgs/${item.image}`"
             width="60"
             height="60"
+            @click="openImageDialog(item.image)"
           />
         </v-card>
       </template>
     </v-data-table>
   </v-card>
+
+  <v-dialog v-model="imageDialog" max-width="500px">
+    <v-card style="padding: 10px">
+      <v-img
+        :src="`http://localhost:5000/imgs/${currentImage}`"
+        height="400px"
+        width="100%"
+      ></v-img>
+      <v-card-actions>
+        <v-btn color="primary" text @click="imageDialog = false"> Close </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script setup>
@@ -148,7 +164,7 @@ import { onMounted, ref, defineProps } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useToast } from "vue-toastification";
 import UserAttendance from "../attendance/UserAttendance.vue";
-
+import Swal from "sweetalert2";
 const loading = ref(true);
 
 const toast = useToast();
@@ -184,19 +200,40 @@ const fetchData = async () => {
 // Fetch data when the component mounts
 onMounted(fetchData);
 
-const deleteEvent = async (id) => {
+const deleteWorker = async (id) => {
   try {
-    const confirm = window.confirm("Are you sure you want to delete");
-    if (confirm) {
-      await axios.delete(`http://localhost:5000/workers/${id}`).then(() => {
-        console.log("deleted successfully");
-        fetchData();
-        toast.success("Deleted successfully");
-      });
+    // Show SweetAlert confirmation dialog
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "You wan't to delete this!",
+      // icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: '<span style="color: white">Yes, delete it!</span>',
+      cancelButtonText: '<span style="color: white">Cancel</span>',
+    });
+
+    // If the user confirms deletion, proceed
+    if (result.isConfirmed) {
+      await axios.delete(`http://localhost:5000/workers/${id}`);
+      toast.success("Deleted successfully");
+      fetchData(); // Reload or fetch updated data
     }
   } catch (err) {
-    console.log(err);
+    console.error(err);
+    toast.error("Error deleting worker");
   }
+};
+
+// Dialog state
+const imageDialog = ref(false);
+const currentImage = ref("");
+
+// Function to open image dialog
+const openImageDialog = (image) => {
+  currentImage.value = image;
+  imageDialog.value = true;
 };
 
 const path = useRoute();
@@ -219,12 +256,20 @@ const path = useRoute();
   cursor: pointer;
   transition: background-color 0.3s;
 }
-
+.edit {
+  text-decoration: none;
+}
 .icon:hover {
   background-color: rgba(0, 0, 0, 0.1);
 }
 .container {
   height: 100%;
   overflow-y: scroll;
+}
+
+.my-chip {
+  background-color: transparent !important;
+  /* Optional: change text color to black or any color */
+  border: none; /* Optional: add a subtle border */
 }
 </style>

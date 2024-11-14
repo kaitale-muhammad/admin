@@ -2,8 +2,11 @@
   <ControlWrapper />
   <v-card flat>
     <v-card-title class="d-flex align-center pe-2">
-      <v-icon icon="mdi-phone"></v-icon> &nbsp;&nbsp;&nbsp; FIND CONTROL
-      ROOM&nbsp;&nbsp;&nbsp;&nbsp;
+      <v-icon
+        icon="mdi-phone"
+        class="text-start font-weight-semibold text-primary"
+      ></v-icon>
+      &nbsp;&nbsp;&nbsp; FIND CONTROL ROOM&nbsp;&nbsp;&nbsp;&nbsp;
 
       <v-spacer></v-spacer>
 
@@ -30,18 +33,18 @@
       <!-- control_id, name, contact -->
 
       <template #header.name>
-        <div class="text-start">Name</div>
+        <div class="text-start font-weight-semibold text-primary">Name</div>
       </template>
       <!-- <template v-slot="header">
             {{ header.descripton }}
           </template> -->
 
       <template #header.contact>
-        <div class="text-start">Contact</div>
+        <div class="text-start font-weight-semibold text-primary">Contact</div>
       </template>
 
       <template #header.actions>
-        <div class="text-start">Actions</div>
+        <div class="text-start font-weight-semibold text-primary">Actions</div>
       </template>
 
       <template #item.actions="{ item }">
@@ -74,7 +77,7 @@ import axios from "axios";
 import { onMounted, ref, defineProps } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useToast } from "vue-toastification";
-
+import Swal from "sweetalert2";
 const loading = ref(true);
 
 const toast = useToast();
@@ -107,18 +110,27 @@ onMounted(fetchData);
 
 const deleteControl = async (control_id) => {
   try {
-    const confirm = window.confirm("Are you sure you want to delete");
-    if (confirm) {
-      await axios
-        .delete(`http://localhost:5000/controls/${control_id}`)
-        .then(() => {
-          console.log("deleted successfully");
-          fetchData();
-          toast.success("Deleted successfully");
-        });
+    // Show SweetAlert confirmation dialog
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "You wan't to delete this!",
+      // icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: '<span style="color: white">Yes, delete it!</span>',
+      cancelButtonText: '<span style="color: white">Cancel</span>',
+    });
+
+    // If the user confirms deletion, proceed
+    if (result.isConfirmed) {
+      await axios.delete(`http://localhost:5000/controls/${control_id}`);
+      toast.success("Deleted successfully");
+      fetchData(); // Reload or fetch updated data
     }
   } catch (err) {
-    console.log(err);
+    console.error(err);
+    toast.error("Error deleting control");
   }
 };
 </script>

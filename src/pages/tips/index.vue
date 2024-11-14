@@ -2,8 +2,11 @@
   <TipsWrapper />
   <v-card flat>
     <v-card-title class="d-flex align-center pe-2">
-      <v-icon icon="mdi-information-outline"></v-icon> &nbsp;&nbsp;&nbsp; FIND
-      TIPS&nbsp;&nbsp;&nbsp;&nbsp;
+      <v-icon
+        icon="mdi-information-outline"
+        class="text-start font-weight-semibold text-primary"
+      ></v-icon>
+      &nbsp;&nbsp;&nbsp; FIND TIPS&nbsp;&nbsp;&nbsp;&nbsp;
 
       <v-spacer></v-spacer>
 
@@ -20,33 +23,46 @@
     </v-card-title>
 
     <v-divider></v-divider>
+
+    <!-- Loading indicator -->
+    <v-row v-if="loading" align="center" justify="center">
+      <v-progress-circular
+        indeterminate
+        color="primary"
+        size="64"
+      ></v-progress-circular>
+    </v-row>
+
+    <!-- Data Table -->
     <v-data-table
       v-model:search="search"
       :items="items"
       :items-per-page="3"
       :headers="headers"
       hover
+      v-else
     >
-      <!-- tips_id, image, title, description, added_by, date_added -->
       <template #header.image>
-        <div class="text-start">Image</div>
+        <div class="text-start font-weight-semibold text-primary">Image</div>
       </template>
       <template #header.title>
-        <div class="text-start">Title</div>
+        <div class="text-start font-weight-semibold text-primary">Title</div>
       </template>
-
       <template #header.description>
-        <div class="text-start">Description</div>
+        <div class="text-start font-weight-semibold text-primary">
+          Description
+        </div>
       </template>
-      <!-- <template v-slot="header">
-          {{ header.descripton }}
-        </template> -->
-
       <template #header.added_by>
-        <div class="text-start">Added By</div>
+        <div class="text-start font-weight-semibold text-primary">Added By</div>
       </template>
       <template #header.date_added>
-        <div class="text-start">Date Added</div>
+        <div class="text-start font-weight-semibold text-primary">
+          Date Added
+        </div>
+      </template>
+      <template #header.actions>
+        <div class="text-start font-weight-semibold text-primary">Actions</div>
       </template>
 
       <template #item.actions="{ item }">
@@ -76,66 +92,109 @@
             :src="`http://localhost:5000/imgs/${item.image}`"
             width="80"
             height="80"
+            @click="showImageDialog(item.image)"
+            style="cursor: pointer"
           />
         </v-card>
       </template>
+
+      <template #item.date_added="{ item }">
+        <div>{{ formatDate(item.date_added) }}</div>
+      </template>
     </v-data-table>
+
+    <!-- Image Dialog -->
+    <v-dialog v-model="dialog" max-width="500px">
+      <v-card style="padding: 10px">
+        <v-img
+          :src="`http://localhost:5000/imgs/${selectedImage}`"
+          height="400px"
+        />
+        <v-card-actions>
+          <v-btn text @click="dialog = false">Close</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-card>
 </template>
 
 <script setup>
 import TipsWrapper from "@/components/tipsWrapper.vue";
 import axios from "axios";
-import { onMounted, ref, defineProps } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { onMounted, ref } from "vue";
 import { useToast } from "vue-toastification";
+import Swal from "sweetalert2";
 
 const loading = ref(true);
-
 const toast = useToast();
-const route = useRoute();
-const tips_id = route.params.id;
 
 const search = ref("");
 const items = ref([]);
-//news_id, image, title, description, added_by, date_added
+const dialog = ref(false);
+const selectedImage = ref("");
+
 const headers = ref([
   { text: "Image", value: "image" },
   { text: "Title", value: "title" },
   { text: "Description", value: "description" },
   { text: "Added By", value: "added_by" },
   { text: "Date Added", value: "date_added" },
-
   { text: "Actions", value: "actions" },
 ]);
 
+// Fetch data function with error handling
 const fetchData = async () => {
   try {
     const response = await axios.get("http://localhost:5000/tips");
     items.value = response.data;
   } catch (error) {
     console.error(error);
+    toast.error("Error fetching data.");
   } finally {
     loading.value = false;
   }
 };
 
-// Fetch data when the component mounts
+// Fetch data on component mount
 onMounted(fetchData);
 
+// Delete tip with confirmation
 const deleteTip = async (tips_id) => {
   try {
-    const confirm = window.confirm("Are you sure you want to delete");
-    if (confirm) {
-      await axios.delete(`http://localhost:5000/tips/${tips_id}`).then(() => {
-        console.log("deleted successfully");
-        fetchData();
-        toast.success("Deleted successfully");
-      });
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "You want to delete this tip!",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: '<span style="color: white">Yes, delete it!</span>',
+      cancelButtonText: '<span style="color: white">Cancel</span>',
+    });
+
+    if (result.isConfirmed) {
+      await axios.delete(`http://localhost:5000/tips/${tips_id}`);
+      toast.success("Deleted successfully");
+      fetchData(); // Refresh the data after deletion
     }
   } catch (err) {
-    console.log(err);
+    console.error(err);
+    toast.error("Error deleting tip");
   }
+};
+
+// Format the date
+const formatDate = (date) => {
+  const formattedDate = new Date(date);
+  const day = formattedDate.getDate().toString().padStart(2, "0");
+  const month = (formattedDate.getMonth() + 1).toString().padStart(2, "0");
+  const year = formattedDate.getFullYear();
+  return `${day}/${month}/${year}`;
+};
+
+// Show image dialog
+const showImageDialog = (image) => {
+  selectedImage.value = image;
+  dialog.value = true;
 };
 </script>
 
@@ -143,6 +202,7 @@ const deleteTip = async (tips_id) => {
 * {
   overflow: hidden;
 }
+
 .icon-container {
   display: flex;
   align-items: center;

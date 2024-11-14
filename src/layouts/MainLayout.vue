@@ -1,10 +1,17 @@
 <template>
   <v-layout>
-    <v-navigation-drawer v-model="drawer" class="bg-blue" theme="dark">
+    <!-- Conditionally render the sidebar -->
+    <v-navigation-drawer
+      v-if="!$route.meta.hideSidebarAndAppBar"
+      v-model="drawer"
+      class="bg-blue"
+      theme="dark"
+    >
       <v-list-item
+        style="color: white"
         v-for="item in items"
         :key="item"
-        class="ma-1"
+        class="ma-1 white--text"
         link
         nav
         :prepend-icon="item.prependIcon"
@@ -25,7 +32,13 @@
       </template>
     </v-navigation-drawer>
 
-    <v-app-bar border="b" class="ps-4" flat>
+    <!-- Conditionally render the app bar -->
+    <v-app-bar
+      v-if="!$route.meta.hideSidebarAndAppBar"
+      border="b"
+      class="ps-4"
+      flat
+    >
       <v-app-bar-nav-icon
         v-if="$vuetify.display.smAndDown"
         @click="drawer = !drawer"
@@ -78,7 +91,6 @@ const router = useRouter();
 const getPath = () => {
   const pathname = path.name;
   if (pathname == "/") return "Dashboard";
-  //   console.log(pathname?.split("/"));
 
   var name = pathname?.split("/")[1];
   return name?.substring(0, 1).toUpperCase() + name?.substring(1, name.length);
@@ -87,7 +99,6 @@ const getPath = () => {
 const logout = () => {
   localStorage.removeItem("user"); // Remove user data from local storage
   router.push("/login");
-  //   console.log("logged Out");
 };
 
 const settings = () => {
@@ -113,12 +124,12 @@ const items = ref([
   },
   {
     title: "Workers",
-    prependIcon: "mdi-account-group",
+    prependIcon: "mdi-account-hard-hat-outline",
     link: "/workers",
   },
   {
     title: "Clients",
-    prependIcon: "mdi-account-group",
+    prependIcon: "mdi-handshake-outline",
     link: "/clients",
   },
   {

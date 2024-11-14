@@ -1,81 +1,99 @@
 <template>
   <div class="dashboard">
-    <div class="dashboard1">
-      <div class="chart">
-        <VCard class="mx-1">
-          <VCardTitle class="text-h6">Clients Vs Users</VCardTitle>
-          <hr />
-          <VCardText>
-            <canvas ref="chartCanvas4"></canvas>
-          </VCardText>
-        </VCard>
-      </div>
-      <div class="chart">
-        <VCard class="mx-1" id="vs">
-          <VCardTitle class="text-h5">
-            <div style="display: flex; justify-content: space-between">
-              Total Application Users
-              <v-icon>mdi-account-group</v-icon>
-            </div>
-          </VCardTitle>
-          <hr />
-          <VCardText>
-            <h1>{{ totalusers }}</h1>
-          </VCardText> </VCard
-        ><br />
-        <VCard class="mx-1" id="vs">
-          <VCardTitle class="text-h6">
-            <div style="display: flex; justify-content: space-between">
-              Total Workers <v-icon>mdi-account-group</v-icon>
-            </div>
-          </VCardTitle>
-          <hr />
-          <VCardText>
-            <h2>{{ totalworkers }}</h2>
-          </VCardText> </VCard
-        ><br />
-        <VCard class="mx-1" id="vs">
-          <VCardTitle class="text-h6">
-            <div style="display: flex; justify-content: space-between">
-              Total Clients <v-icon>mdi-account-group</v-icon>
-            </div>
-          </VCardTitle>
-          <hr />
-          <VCardText>
-            <h2>{{ totalclients }}</h2>
-          </VCardText>
-        </VCard>
-      </div>
-      <div class="chart">
-        <VCard class="mx-1" id="vs">
-          <VCardTitle class="text-h6">Workers Vs Users</VCardTitle>
-          <hr />
-          <VCardText>
-            <canvas ref="chartCanvas3"></canvas>
-          </VCardText>
-        </VCard>
-      </div>
-    </div>
+    <v-container>
+      <v-row>
+        <!-- Clients Vs Users Chart -->
+        <v-col cols="12" md="6" lg="4">
+          <v-card class="mx-1">
+            <v-card-title class="text-h6">Clients Vs Users</v-card-title>
+            <hr />
+            <v-card-text>
+              <canvas ref="chartCanvas4"></canvas>
+            </v-card-text>
+          </v-card>
+        </v-col>
+
+        <!-- Total Application Users & Other Stats -->
+        <v-col cols="12" md="6" lg="4">
+          <v-card class="mx-1" id="vs">
+            <v-card-title class="text-h6">
+              <div style="display: flex; justify-content: space-between">
+                Total Application Users
+                <v-icon>mdi-account-group</v-icon>
+              </div>
+            </v-card-title>
+            <hr />
+            <v-card-text>
+              <h1>{{ totalusers }}</h1>
+            </v-card-text>
+          </v-card>
+          <v-card class="mx-1" id="vs">
+            <v-card-title class="text-h6">
+              <div style="display: flex; justify-content: space-between">
+                Total Workers <v-icon>mdi-account-hard-hat-outline</v-icon>
+              </div>
+            </v-card-title>
+            <hr />
+            <v-card-text>
+              <h2>{{ totalworkers }}</h2>
+            </v-card-text>
+          </v-card>
+          <v-card class="mx-1" id="vs">
+            <v-card-title class="text-h6">
+              <div style="display: flex; justify-content: space-between">
+                Total Clients <v-icon>mdi-handshake-outline</v-icon>
+              </div>
+            </v-card-title>
+            <hr />
+            <v-card-text>
+              <h2>{{ totalclients }}</h2>
+            </v-card-text>
+          </v-card>
+        </v-col>
+
+        <!-- Workers Vs Users Chart -->
+        <v-col cols="12" md="6" lg="4">
+          <v-card class="mx-1" id="vs">
+            <v-card-title class="text-h6">Workers Vs Users</v-card-title>
+            <hr />
+            <v-card-text>
+              <canvas ref="chartCanvas3"></canvas>
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
+    </v-container>
 
     <div class="dashboard2">
-      <div class="chart">
-        <VCard class="mx-1">
-          <VCardTitle class="text-h6">Categories</VCardTitle>
-          <hr />
-          <VCardText>
-            <canvas ref="chartCanvas"></canvas>
-          </VCardText>
-        </VCard>
-      </div>
-      <div class="chart">
-        <VCard class="mx-1">
-          <VCardTitle class="text-h6">Categories</VCardTitle>
-          <hr />
-          <VCardText>
-            <canvas ref="chartCanvas2"></canvas>
-          </VCardText>
-        </VCard>
-      </div>
+      <v-container>
+        <v-row>
+          <!-- Clients Vs Users Chart -->
+          <v-col cols="12" md="6" lg="6">
+            <div class="chart">
+              <VCard class="mx-1">
+                <VCardTitle class="text-h6">Categories</VCardTitle>
+                <hr />
+                <VCardText>
+                  <canvas ref="chartCanvas"></canvas>
+                </VCardText>
+              </VCard>
+            </div>
+          </v-col>
+
+          <!-- Clients Vs Users Chart -->
+          <v-col cols="12" md="6" lg="6">
+            <div class="chart">
+              <VCard class="mx-1">
+                <VCardTitle class="text-h6">Categories</VCardTitle>
+                <hr />
+                <VCardText>
+                  <canvas ref="chartCanvas2"></canvas>
+                </VCardText>
+              </VCard>
+            </div>
+          </v-col>
+        </v-row>
+      </v-container>
     </div>
   </div>
 </template>
@@ -332,14 +350,14 @@ onMounted(async () => {
   margin-top: 5px;
 }
 .dashboard2 {
-  margin-top: 5px;
+  margin-top: -20px;
   display: flex;
   margin-bottom: 10px;
   margin-left: 5px;
 }
 
 #vs {
-  /* height: 250px; */
+  margin-bottom: 15px;
 }
 canvas {
   max-width: 100%;

@@ -61,13 +61,23 @@
                 placeholder="Date joined"
                 name="name"
               />
-              <input
-                type="number"
-                v-model="form.site"
-                placeholder="Client ID"
-                name="cid"
-                id="cid"
-              />
+
+              <div class="form-row">
+                <input
+                  type="number"
+                  v-model="form.site"
+                  placeholder="Client ID"
+                  name="cid"
+                  id="cid"
+                  style="width: auto; margin-right: 10px"
+                />
+                <div class="supervisor-checkbox">
+                  <p>Supervisor</p>
+                  <div>
+                    <VCheckbox v-model="form.supervisor" />
+                  </div>
+                </div>
+              </div>
 
               <v-btn
                 class="mt-1"
@@ -130,6 +140,22 @@ textarea {
   align-items: center;
   justify-content: center;
 }
+
+.form-row {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Adds space between elements */
+}
+
+.supervisor-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Adds space between "Supervisor" and the checkbox */
+}
+
+.supervisor-checkbox p {
+  margin: 0;
+}
 </style>
 
 <script setup>
@@ -181,6 +207,9 @@ const submitForm = async () => {
     formData.append("date_joined", form.date_joined);
     formData.append("site", form.site);
 
+    // Conditionally add the "supervisor" value
+    formData.append("supervisor", form.supervisor ? "1" : "");
+
     if (filedata.value) {
       formData.append("file", filedata.value);
     }
@@ -195,8 +224,7 @@ const submitForm = async () => {
       }
     );
     loading.value = false;
-    toast.success("Workser added successfully!");
-    // isActive.value = false;
+    toast.success("Worker added successfully!");
     fetch();
   } catch (error) {
     loading.value = false;

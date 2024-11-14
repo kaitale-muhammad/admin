@@ -2,8 +2,11 @@
   <ClientWrapper />
   <v-card flat>
     <v-card-title class="d-flex align-center pe-2">
-      <v-icon icon="mdi-account-group"></v-icon> &nbsp;&nbsp;&nbsp; FIND CLIENT
-      &nbsp;&nbsp;&nbsp;&nbsp;
+      <v-icon
+        icon="mdi-handshake-outline"
+        class="text-start font-weight-semibold text-primary"
+      ></v-icon>
+      &nbsp;&nbsp;&nbsp; FIND CLIENT &nbsp;&nbsp;&nbsp;&nbsp;
 
       <v-spacer></v-spacer>
 
@@ -29,48 +32,54 @@
     >
       <!-- id, name, contact, email, location, man_power, gun, dog, baton, touch, radio_call, date_added -->
       <template #header.id>
-        <div class="text-start">ID</div>
+        <div class="text-start font-weight-semibold text-primary">ID</div>
       </template>
       <template #header.name>
-        <div class="text-start">Name</div>
+        <div class="text-start font-weight-semibold text-primary">Name</div>
       </template>
       <template #header.contact>
-        <div class="text-start">Contact</div>
+        <div class="text-start font-weight-semibold text-primary">Contact</div>
       </template>
       <template #header.email>
-        <div class="text-start">Email</div>
+        <div class="text-start font-weight-semibold text-primary">Email</div>
       </template>
       <template #header.site_name>
-        <div class="text-start">Site Name</div>
+        <div class="text-start font-weight-semibold text-primary">
+          Site Name
+        </div>
       </template>
       <template #header.location>
-        <div class="text-start">Location</div>
+        <div class="text-start font-weight-semibold text-primary">Location</div>
       </template>
       <template #header.man_power>
-        <div class="text-start">Man power</div>
+        <div class="text-start font-weight-semibold text-primary">
+          Man power
+        </div>
       </template>
       <template #header.gun>
-        <div class="text-start">Gun</div>
+        <div class="text-start font-weight-semibold text-primary">Gun</div>
       </template>
       <template #header.dog>
-        <div class="text-start">Dog</div>
+        <div class="text-start font-weight-semibold text-primary">Dog</div>
       </template>
       <template #header.baton>
-        <div class="text-start">Baton</div>
+        <div class="text-start font-weight-semibold text-primary">Baton</div>
       </template>
       <template #header.touch>
-        <div class="text-start">Touch</div>
+        <div class="text-start font-weight-semibold text-primary">Touch</div>
       </template>
 
       <template #header.radio_call>
-        <div class="text-start">Radio call</div>
+        <div class="text-start font-weight-semibold text-primary">
+          Radio call
+        </div>
       </template>
       <template #header.others>
-        <div class="text-start">Others</div>
+        <div class="text-start font-weight-semibold text-primary">Others</div>
       </template>
 
       <template #header.actions>
-        <div class="text-start">Actions</div>
+        <div class="text-start font-weight-semibold text-primary">Actions</div>
       </template>
 
       <!-- id, name, contact, email, location, man_power, gun, dog, baton, touch, radio_call, date_added -->
@@ -82,7 +91,7 @@
               pa="7"
               color="red"
               class="icon"
-              @click="deleteControl(item.id)"
+              @click="deleteClients(item.id)"
             ></v-icon>
           </div>
 
@@ -104,7 +113,7 @@ import axios from "axios";
 import { onMounted, ref, defineProps } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useToast } from "vue-toastification";
-
+import Swal from "sweetalert2";
 const loading = ref(true);
 
 const toast = useToast();
@@ -146,18 +155,29 @@ const fetchData = async () => {
 // Fetch data when the component mounts
 onMounted(fetchData);
 
-const deleteControl = async (id) => {
+const deleteClients = async (id) => {
   try {
-    const confirm = window.confirm("Are you sure you want to delete");
-    if (confirm) {
-      await axios.delete(`http://localhost:5000/clients/${id}`).then(() => {
-        console.log("deleted successfully");
-        fetchData();
-        toast.success("Deleted successfully");
-      });
+    // Show SweetAlert confirmation dialog
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "You wan't to delete this!",
+      // icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: '<span style="color: white">Yes, delete it!</span>',
+      cancelButtonText: '<span style="color: white">Cancel</span>',
+    });
+
+    // If the user confirms deletion, proceed
+    if (result.isConfirmed) {
+      await axios.delete(`http://localhost:5000/clients/${id}`);
+      toast.success("Deleted successfully");
+      fetchData(); // Reload or fetch updated data
     }
   } catch (err) {
-    console.log(err);
+    console.error(err);
+    toast.error("Error deleting client");
   }
 };
 </script>

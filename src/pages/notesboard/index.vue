@@ -2,8 +2,11 @@
   <NoteBoard />
   <v-card flat>
     <v-card-title class="d-flex align-center pe-2">
-      <v-icon icon="mdi-note-outline"></v-icon> &nbsp;&nbsp;&nbsp; FIND
-      NOTES&nbsp;&nbsp;&nbsp;&nbsp;
+      <v-icon
+        icon="mdi-note-outline"
+        class="text-start font-weight-semibold text-primary"
+      ></v-icon>
+      &nbsp;&nbsp;&nbsp; FIND NOTES&nbsp;&nbsp;&nbsp;&nbsp;
 
       <v-spacer></v-spacer>
 
@@ -27,27 +30,23 @@
       :headers="headers"
       hover
     >
-      <!-- notes_id, image, title, description, date_added, added_by -->
+      <!-- Custom Headers with Blue Color -->
       <template #header.image>
-        <div class="text-start">Image</div>
+        <div class="text-start" style="color: blue">Image</div>
       </template>
       <template #header.title>
-        <div class="text-start">Title</div>
+        <div class="text-start" style="color: blue">Title</div>
       </template>
-
       <template #header.description>
-        <div class="text-start">Description</div>
+        <div class="text-start" style="color: blue">Description</div>
       </template>
-      <!-- <template v-slot="header">
-        {{ header.descripton }}
-      </template> -->
-
       <template #header.added_by>
-        <div class="text-start">Added By</div>
+        <div class="text-start" style="color: blue">Added By</div>
       </template>
       <template #header.date_added>
-        <div class="text-start">Date Added</div>
+        <div class="text-start" style="color: blue">Date Added</div>
       </template>
+
       <template #item.actions="{ item }">
         <div class="icon-container">
           <div class="delete">
@@ -62,41 +61,72 @@
 
           <div class="edit">
             <router-link :to="`/notesboard/${item.notes_id}`">
-              <v-icon icon="mdi-pencil" pa="7" class="icon" color="blue">
-              </v-icon>
+              <v-icon
+                icon="mdi-pencil"
+                pa="7"
+                class="icon"
+                color="blue"
+              ></v-icon>
             </router-link>
           </div>
         </div>
       </template>
 
+      <!-- Image with Click Event to Show Larger View -->
       <template #item.image="{ item }">
-        <v-card class="my-2" elevation="2" rounded style="width: 80px">
+        <v-card
+          class="my-2"
+          elevation="2"
+          rounded
+          style="width: 80px"
+          @click="openImageModal(item.image)"
+        >
           <img
             :src="`http://localhost:5000/imgs/${item.image}`"
             width="80"
             height="80"
+            style="cursor: pointer"
           />
         </v-card>
       </template>
+
+      <!-- Date Formatting -->
+      <template #item.date_added="{ item }">
+        <div>{{ formatDate(item.date_added) }}</div>
+      </template>
     </v-data-table>
   </v-card>
-</template>
 
+  <!-- Image Modal -->
+  <v-dialog v-model="showImageModal" max-width="500px">
+    <v-card style="padding: 10px">
+      <!-- <v-card-title>
+        <span class="headline">Image View</span>
+      </v-card-title> -->
+      <v-card-text>
+        <v-img :src="imageModalSrc" height="400px" width="100%" />
+      </v-card-text>
+      <v-card-actions>
+        <v-btn text @click="showImageModal = false">Close</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+</template>
 <script setup>
 import axios from "axios";
-import { onMounted, ref, defineProps } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { onMounted, ref } from "vue";
 import { useToast } from "vue-toastification";
+import Swal from "sweetalert2";
 
+// Reactive references
 const loading = ref(true);
-
 const toast = useToast();
-const route = useRoute();
-const id = route.params.id;
-
 const search = ref("");
 const items = ref([]);
-//notes_id, image, title, description, date_added, added_by
+const showImageModal = ref(false);
+const imageModalSrc = ref("");
+
+// Headers for the table
 const headers = ref([
   { text: "Image", value: "image" },
   { text: "Title", value: "title" },
@@ -106,6 +136,7 @@ const headers = ref([
   { text: "Actions", value: "actions" },
 ]);
 
+// Fetch data from API
 const fetchData = async () => {
   try {
     const response = await axios.get("http://localhost:5000/notesboard");
@@ -120,24 +151,44 @@ const fetchData = async () => {
 // Fetch data when the component mounts
 onMounted(fetchData);
 
+// Delete service function
 const deleteService = async (id) => {
   try {
-    const confirm = window.confirm("Are you sure you want to delete");
-    if (confirm) {
-      await axios
-        .delete(`http://localhost:5000/notesboard/${notes_id}`)
-        .then(() => {
-          console.log("deleted successfully");
-          fetchData();
-          toast.success("Deleted successfully");
-        });
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "You want to delete this!",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: '<span style="color: white">Yes, delete it!</span>',
+      cancelButtonText: '<span style="color: white">Cancel</span>',
+    });
+
+    if (result.isConfirmed) {
+      await axios.delete(`http://localhost:5000/notesboard/${id}`);
+      fetchData();
+      toast.success("Deleted successfully");
     }
   } catch (err) {
     console.log(err);
   }
 };
 
-const path = useRoute();
+// Function to open image modal
+const openImageModal = (image) => {
+  imageModalSrc.value = `http://localhost:5000/imgs/${image}`;
+  showImageModal.value = true;
+};
+
+// Function to format date as day/month/year
+const formatDate = (date) => {
+  const d = new Date(date);
+  const day = String(d.getDate()).padStart(2, "0"); // Ensure day is 2 digits
+  const month = String(d.getMonth() + 1).padStart(2, "0"); // Ensure month is 2 digits (getMonth() is zero-based)
+  const year = d.getFullYear();
+
+  return `${day}/${month}/${year}`;
+};
 </script>
 
 <style scoped>
@@ -160,5 +211,9 @@ const path = useRoute();
 
 .icon:hover {
   background-color: rgba(0, 0, 0, 0.1);
+}
+
+.v-card img {
+  cursor: pointer;
 }
 </style>

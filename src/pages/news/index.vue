@@ -2,8 +2,11 @@
   <NewsWrapper />
   <v-card flat>
     <v-card-title class="d-flex align-center pe-2">
-      <v-icon icon="mdi-equal-box"></v-icon> &nbsp;&nbsp;&nbsp; FIND
-      NEWS&nbsp;&nbsp;&nbsp;&nbsp;
+      <v-icon
+        icon="mdi-equal-box"
+        class="text-start font-weight-semibold text-primary"
+      ></v-icon>
+      &nbsp;&nbsp;&nbsp; FIND NEWS&nbsp;&nbsp;&nbsp;&nbsp;
 
       <v-spacer></v-spacer>
 
@@ -27,28 +30,24 @@
       :headers="headers"
       hover
     >
-      <!-- event_id, image, title, description, added_by, date_added, date_to_occur -->
       <template #header.image>
-        <div class="text-start">Image</div>
+        <div class="text-start header-blue">Image</div>
       </template>
       <template #header.title>
-        <div class="text-start">Title</div>
+        <div class="text-start header-blue">Title</div>
       </template>
-
       <template #header.description>
-        <div class="text-start">Description</div>
+        <div class="text-start header-blue">Description</div>
       </template>
-      <!-- <template v-slot="header">
-        {{ header.descripton }}
-      </template> -->
-
       <template #header.added_by>
-        <div class="text-start">Added By</div>
+        <div class="text-start header-blue">Added By</div>
       </template>
       <template #header.date_added>
-        <div class="text-start">Date Added</div>
+        <div class="text-start header-blue">Date Added</div>
       </template>
-
+      <template #header.actions>
+        <div class="text-start font-weight-semibold text-primary">Actions</div>
+      </template>
       <template #item.actions="{ item }">
         <div class="icon-container">
           <div class="delete">
@@ -76,43 +75,59 @@
             :src="`http://localhost:5000/imgs/${item.image}`"
             width="80"
             height="80"
+            @click="openImageDialog(`http://localhost:5000/imgs/${item.image}`)"
           />
         </v-card>
       </template>
+
+      <template #item.date_added="{ item }">
+        <div class="text-start">{{ formatDate(item.date_added) }}</div>
+      </template>
     </v-data-table>
   </v-card>
+
+  <!-- Image Dialog -->
+  <v-dialog v-model="imageDialog" max-width="500px">
+    <v-card style="padding: 10px">
+      <v-img :src="imageDialogSrc" height="400px" width="100%" />
+      <v-card-actions>
+        <v-btn color="primary" text @click="imageDialog = false"> Close </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script setup>
 import NewsWrapper from "@/components/newsWrapper.vue";
 import axios from "axios";
-import { onMounted, ref, defineProps } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { onMounted, ref } from "vue";
+import { useRoute } from "vue-router";
 import { useToast } from "vue-toastification";
+import Swal from "sweetalert2";
 
 const loading = ref(true);
-
 const toast = useToast();
 const route = useRoute();
 const news_id = route.params.id;
 
 const search = ref("");
 const items = ref([]);
-//news_id, image, title, description, added_by, date_added
+
+// Define the headers for the table
 const headers = ref([
   { text: "Image", value: "image" },
   { text: "Title", value: "title" },
   { text: "Description", value: "description" },
   { text: "Added By", value: "added_by" },
   { text: "Date Added", value: "date_added" },
-
   { text: "Actions", value: "actions" },
 ]);
 
+// Fetch data from the API
 const fetchData = async () => {
   try {
     const response = await axios.get("http://localhost:5000/news");
-    items.value = response.data;
+    items.value = response.data; // Assuming response data is an array of items
   } catch (error) {
     console.error(error);
   } finally {
@@ -120,28 +135,56 @@ const fetchData = async () => {
   }
 };
 
-// Fetch data when the component mounts
+// Fetch data on component mount
 onMounted(fetchData);
 
+// Delete news handler
 const deleteNews = async (news_id) => {
   try {
-    const confirm = window.confirm("Are you sure you want to delete");
-    if (confirm) {
-      await axios.delete(`http://localhost:5000/news/${news_id}`).then(() => {
-        console.log("deleted successfully");
-        fetchData();
-        toast.success("Deleted successfully");
-      });
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "You want to delete this news!",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: '<span style="color: white">Yes, delete it!</span>',
+      cancelButtonText: '<span style="color: white">Cancel</span>',
+    });
+
+    if (result.isConfirmed) {
+      await axios.delete(`http://localhost:5000/news/${news_id}`);
+      toast.success("Deleted successfully");
+      fetchData(); // Reload or fetch updated data
     }
   } catch (err) {
-    console.log(err);
+    console.error(err);
+    toast.error("Error deleting news");
   }
+};
+
+// Format the date as day/month/year
+const formatDate = (date) => {
+  const d = new Date(date);
+  const day = String(d.getDate()).padStart(2, "0");
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const year = d.getFullYear();
+  return `${day}/${month}/${year}`;
+};
+
+// Image dialog logic
+const imageDialog = ref(false);
+const imageDialogSrc = ref("");
+
+const openImageDialog = (src) => {
+  imageDialogSrc.value = src;
+  imageDialog.value = true;
 };
 </script>
 
 <style scoped>
-* {
-  overflow: hidden;
+.header-blue {
+  color: #1e88e5; /* Blue color */
+  font-weight: bold;
 }
 .icon-container {
   display: flex;

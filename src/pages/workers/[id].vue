@@ -1,115 +1,163 @@
 <template>
   <div class="main">
-    <div class="content">
-      <VCard>
-        <div class="top">
-          <v-btn class="text-none me-2" @click="back" height="48" icon slim>
-            <v-avatar color="info">
-              <v-icon icon="mdi-arrow-left-thick" color="white"></v-icon>
-            </v-avatar>
-          </v-btn>
+    <v-container>
+      <v-row>
+        <v-col cols="12" md="6" lg="6">
+          <div class="content">
+            <v-card class="pa-4" max-width="400px" v-if="form">
+              <!-- Header Section -->
+              <div class="d-flex align-center mb-4">
+                <v-btn
+                  class="text-none me-2"
+                  @click="back"
+                  height="48"
+                  icon
+                  slim
+                >
+                  <v-avatar color="info">
+                    <v-icon icon="mdi-arrow-left-thick" color="white"></v-icon>
+                  </v-avatar>
+                </v-btn>
+                <span class="headline">{{ form.name }}</span>
+              </div>
 
-          <b style="margin-left: 10px">{{ form.name }}</b
-          ><br />
-          <!-- chevron-left -->
-        </div>
+              <!-- Image Section -->
+              <v-img
+                :src="`http://localhost:5000/imgs/` + form.file"
+                height="200"
+                class="mb-4"
+                contain
+              ></v-img>
 
-        <img
-          :src="`http://localhost:5000/imgs/` + form.file"
-          width="100%"
-          height="150"
-        /><br /><br />
+              <!-- Worker Details Section -->
+              <v-divider></v-divider>
+              <div class="my-1">
+                <div class="d-flex justify-between mb-1">
+                  <b>Worker ID:</b> <span>{{ form.worker_id }}</span>
+                </div>
+                <div class="d-flex justify-between mb-1">
+                  <b>Name:</b> <span>{{ form.name }}</span>
+                </div>
+                <div class="d-flex justify-between mb-1">
+                  <b>Date of Birth:</b> <span>{{ form.date_of_birth }}</span>
+                </div>
+                <div class="d-flex justify-between mb-1">
+                  <b>Contact:</b> <span>{{ form.contact }}</span>
+                </div>
+                <div class="d-flex justify-between mb-2">
+                  <b>Email:</b> <span>{{ form.email }}</span>
+                </div>
+                <div class="d-flex justify-between mb-1">
+                  <b>Date Joined:</b> <span>{{ form.date_joined }}</span>
+                </div>
+                <div class="d-flex justify-between mb-1">
+                  <b>Client ID:</b> <span>{{ form.site }}</span>
+                </div>
+              </div>
+            </v-card>
+          </div>
+        </v-col>
+        <v-col cols="12" md="6" lg="6">
+          <VCard
+            width="400px"
+            class="card"
+            align-center
+            elevation="true"
+            border="red"
+          >
+            <VForm @submit.prevent="submitForm">
+              <div class="image">
+                <VAvatar
+                  :image="'http://localhost:5000/imgs/' + form.file"
+                ></VAvatar
+                ><input
+                  type="file"
+                  v-on:change="handleFileChange"
+                  placeholder="File"
+                />
+              </div>
 
-        <hr />
-        <!-- id, image, worker_id, name, date_of_birth, contact, email, date_joined, site -->
-        <b>Worker ID</b> {{ form.worker_id }} <br />
-        <b>Name:</b> {{ form.name }} <br />
-        <b>Date of Birth:</b> {{ form.date_of_birth }} <br />
-        <b>Contact:</b> {{ form.contact }} <br />
-        <b>Email:</b> {{ form.email }} <br />
-        <b>Date Joined:</b> {{ form.date_joined }} <br />
-        <b>Client ID:</b> {{ form.site }}
-      </VCard>
-    </div>
-
-    <VCard
-      width="400px"
-      class="card"
-      align-center
-      elevation="true"
-      border="red"
-    >
-      <VForm @submit.prevent="submitForm">
-        <div class="image">
-          <VAvatar :image="'http://localhost:5000/imgs/' + form.file"></VAvatar
-          ><input
-            type="file"
-            v-on:change="handleFileChange"
-            placeholder="File"
-          />
-        </div>
-
-        <input
-          type="text"
-          v-model="form.worker_id"
-          placeholder="Worker ID"
-          name="id"
-          id="id"
-        />
-        <input
-          type="text"
-          v-model="form.name"
-          placeholder="Name"
-          name="name"
-          required
-        />
-        <p>date of birth</p>
-        <input
-          type="date"
-          v-model="form.date_of_birth"
-          placeholder="Date of birth"
-          name="dob"
-          required
-        />
-        <input
-          type="text"
-          v-model="form.contact"
-          placeholder="Contact"
-          name="name"
-          required
-        />
-        <input
-          type="email"
-          v-model="form.email"
-          placeholder="Email"
-          name="email"
-        />
-        <p>date joined</p>
-        <input
-          type="date"
-          v-model="form.date_joined"
-          placeholder="Date joined"
-          name="name"
-        />
-        <input
+              <input
+                type="text"
+                v-model="form.worker_id"
+                placeholder="Worker ID"
+                name="id"
+                id="id"
+              />
+              <input
+                type="text"
+                v-model="form.name"
+                placeholder="Name"
+                name="name"
+                required
+              />
+              <p>date of birth</p>
+              <input
+                type="date"
+                v-model="form.date_of_birth"
+                placeholder="Date of birth"
+                name="dob"
+                required
+              />
+              <input
+                type="text"
+                v-model="form.contact"
+                placeholder="Contact"
+                name="name"
+                required
+              />
+              <input
+                type="email"
+                v-model="form.email"
+                placeholder="Email"
+                name="email"
+              />
+              <p>date joined</p>
+              <input
+                type="date"
+                v-model="form.date_joined"
+                placeholder="Date joined"
+                name="name"
+              />
+              <!-- <input
           type="number"
           v-model="form.site"
           placeholder="Client ID"
           name="cid"
           id="cid"
-        />
+        /> -->
 
-        <v-btn
-          class="mt-2"
-          :disabled="loading"
-          type="submit"
-          color="primary"
-          block
-        >
-          {{ loading ? "loading..." : "Edit" }}
-        </v-btn>
-      </VForm>
-    </VCard>
+              <div class="form-row">
+                <input
+                  type="number"
+                  v-model="form.site"
+                  placeholder="Client ID"
+                  name="cid"
+                  id="cid"
+                  style="width: auto; margin-right: 10px"
+                />
+                <div class="supervisor-checkbox">
+                  <p>Supervisor</p>
+                  <div>
+                    <VCheckbox v-model="form.supervisor" />
+                  </div>
+                </div>
+              </div>
+
+              <v-btn
+                class="mt-2"
+                :disabled="loading"
+                type="submit"
+                color="primary"
+                block
+              >
+                {{ loading ? "loading..." : "Edit" }}
+              </v-btn>
+            </VForm>
+          </VCard>
+        </v-col>
+      </v-row>
+    </v-container>
   </div>
 </template>
 
@@ -130,6 +178,7 @@ const form = reactive({
   email: "",
   date_joined: "",
   site: "",
+  supervisor: "",
 });
 const back = () => {
   router.go(-1);
@@ -143,7 +192,6 @@ async function fetch() {
   try {
     const response = await axios.get(`http://localhost:5000/workers/${id}`);
     var data = response.data;
-    // id, image, worker_id, name, date_of_birth, contact, email, date_joined, site
 
     form.worker_id = data.worker_id || "kk";
     form.file = data.image || "";
@@ -153,11 +201,14 @@ async function fetch() {
     form.email = data.email || "";
     form.date_joined = data.date_joined || "";
     form.site = data.site || "";
+    // Set supervisor to true if it's 1, otherwise false
+    form.supervisor = data.supervisor === 1;
   } catch (err) {
     console.error(err);
     toast.error("Failed to load worker");
   }
 }
+
 const filedata = ref("");
 const handleFileChange = (event) => {
   const file = event.target.files[0];
@@ -171,7 +222,6 @@ onMounted(async () => {
 const submitForm = async () => {
   loading.value = true;
   try {
-    // id, image, worker_id, name, date_of_birth, contact, email, date_joined, site
     const formData = new FormData();
     formData.append("worker_id", form.worker_id);
     formData.append("name", form.name);
@@ -180,6 +230,8 @@ const submitForm = async () => {
     formData.append("email", form.email);
     formData.append("date_joined", form.date_joined);
     formData.append("site", form.site);
+    // If supervisor is true, save as "1", otherwise "0"
+    formData.append("supervisor", form.supervisor ? "1" : "0");
 
     formData.append("image", form.file);
 
@@ -202,7 +254,7 @@ const submitForm = async () => {
   } catch (error) {
     loading.value = false;
     console.error(error);
-    toast.error("Failed to update  Worker");
+    toast.error("Failed to update Worker");
   }
 };
 </script>
@@ -249,5 +301,59 @@ textarea {
 .image {
   display: flex;
   gap: 5px;
+}
+
+/*  */
+
+.v-card {
+  background-color: #f9f9f9;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}
+
+.headline {
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+}
+
+.v-divider {
+  margin: 10px 0;
+}
+
+.d-flex {
+  display: flex;
+}
+
+.d-flex.justify-between {
+  justify-content: space-between;
+}
+
+.mb-4 {
+  margin-bottom: 10px;
+}
+
+.my-4 {
+  margin-top: 10px;
+}
+
+.mb-2 {
+  margin-bottom: 8px;
+}
+
+.form-row {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Adds space between elements */
+}
+
+.supervisor-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Adds space between "Supervisor" and the checkbox */
+}
+
+.supervisor-checkbox p {
+  margin: 0;
 }
 </style>

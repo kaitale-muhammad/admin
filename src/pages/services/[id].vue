@@ -1,86 +1,96 @@
 <template>
   <div class="main">
-    <div class="content">
-      <VCard>
-        <div class="top">
-          <v-btn class="text-none me-2" @click="back" height="48" icon slim>
-            <v-avatar color="info">
-              <v-icon icon="mdi-arrow-left-thick" color="white"></v-icon>
-            </v-avatar>
-          </v-btn>
+    <v-container>
+      <v-row>
+        <v-col cols="12" md="6" lg="6">
+          <div class="content">
+            <VCard>
+              <div class="top">
+                <v-btn
+                  class="text-none me-2"
+                  @click="back"
+                  height="48"
+                  icon
+                  slim
+                >
+                  <v-avatar color="info">
+                    <v-icon icon="mdi-arrow-left-thick" color="white"></v-icon>
+                  </v-avatar>
+                </v-btn>
 
-          <b style="margin-left: 10px">{{ form.service_name }}</b
-          ><br />
-          <!-- chevron-left -->
-        </div>
+                <b style="margin-left: 10px">{{ form.service_name }}</b
+                ><br />
+              </div>
 
-        <img
-          :src="`http://localhost:5000/imgs/` + form.file"
-          width="100%"
-          height="200"
-        /><br /><br />
+              <img
+                :src="`http://localhost:5000/imgs/` + form.file"
+                width="100%"
+                height="200"
+              /><br /><br />
 
-        {{ form.description }}<br /><br />
-        <hr />
-        <b>Status: </b>{{ form.status }}
-      </VCard>
-    </div>
+              {{ form.description }}<br /><br />
+              <hr />
+              <b>Status: </b>{{ form.status }}
+            </VCard>
+          </div>
+        </v-col>
 
-    <VCard
-      width="400px"
-      class="card"
-      align-center
-      elevation="true"
-      border="red"
-    >
-      <VForm @submit.prevent="submitForm">
-        <input
-          type="text"
-          v-model="form.service_name"
-          placeholder="Service Name"
-        />
-        <div class="image">
-          <VAvatar :image="'http://localhost:5000/imgs/' + form.file"></VAvatar
-          ><input
-            type="file"
-            v-on:change="handleFileChange"
-            placeholder="File"
-          />
-        </div>
+        <v-col cols="12" md="6" lg="6">
+          <VCard
+            width="400px"
+            class="card"
+            align-center
+            elevation="true"
+            border="red"
+          >
+            <VForm @submit.prevent="submitForm">
+              <input
+                type="text"
+                v-model="form.service_name"
+                placeholder="Service Name"
+              />
+              <div class="image">
+                <VAvatar
+                  :image="'http://localhost:5000/imgs/' + form.file"
+                ></VAvatar>
+                <input
+                  type="file"
+                  v-on:change="handleFileChange"
+                  placeholder="File"
+                />
+              </div>
 
-        <textarea
-          type="text"
-          v-model="form.description"
-          placeholder="Description"
-        ></textarea>
-        <input type="text" v-model="form.status" placeholder="Status" />
+              <textarea
+                type="text"
+                v-model="form.description"
+                placeholder="Description"
+                rows="6"
+              ></textarea>
+              <input type="text" v-model="form.status" placeholder="Status" />
 
-        <div>
-          <!-- <input
-            type="checkbox"
-            v-model="form.featured"
-            :value="form.featured"
-          /> -->
+              <div>
+                <v-checkbox
+                  label="Featured"
+                  v-model="form.featured"
+                  :value="true"
+                  :false-value="false"
+                ></v-checkbox>
+              </div>
 
-          <v-checkbox
-            label="Featured"
-            :onchange="checked"
-            v-model="form.featured"
-            value="1"
-          ></v-checkbox>
-        </div>
-
-        <v-btn
-          class="mt-2"
-          :disabled="loading"
-          type="submit"
-          color="primary"
-          block
-        >
-          {{ loading ? "loading..." : "Edit" }}
-        </v-btn>
-      </VForm>
-    </VCard>
+              <v-btn
+                class="mt-2"
+                :disabled="loading"
+                type="submit"
+                color="primary"
+                block
+              >
+                {{ loading ? "loading..." : "Edit" }}
+              </v-btn>
+            </VForm>
+          </VCard>
+        </v-col>
+      </v-row>
+    </v-container>
   </div>
 </template>
 
@@ -96,24 +106,18 @@ const form = reactive({
   file: "",
   description: "",
   status: "",
-  featured: false,
+  featured: false, // Default value should be false
 });
 
 const back = () => {
   router.go(-1);
 };
 
-// const featured = ref(false);
-
-const checked = () => {
-  const check_value = form.featured;
-  console.log(check_value);
-};
-
 const loading = ref(false);
 const route = useRoute();
 const id = route.params.id;
 const toast = useToast();
+
 async function fetch() {
   try {
     const response = await axios.get(`http://localhost:5000/services/${id}`);
@@ -123,12 +127,13 @@ async function fetch() {
     form.file = data.image || "";
     form.description = data.descripton || "";
     form.status = data.status || "";
-    form.featured = data.featured || "";
+    form.featured = data.featured === 1 || data.featured === true; // Convert to boolean
   } catch (err) {
     console.error(err);
     toast.error("Failed to load service details");
   }
 }
+
 const filedata = ref("");
 const handleFileChange = (event) => {
   const file = event.target.files[0];
@@ -136,9 +141,11 @@ const handleFileChange = (event) => {
     filedata.value = file;
   }
 };
+
 onMounted(async () => {
   fetch();
 });
+
 const submitForm = async () => {
   loading.value = true;
   try {
@@ -146,7 +153,7 @@ const submitForm = async () => {
     formData.append("service_name", form.service_name);
     formData.append("description", form.description);
     formData.append("status", form.status);
-    formData.append("featured", form.featured);
+    formData.append("featured", form.featured ? 1 : 0); // Send as 1 or 0
     formData.append("image", form.file);
 
     if (filedata.value) {
