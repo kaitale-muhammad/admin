@@ -4,8 +4,7 @@
     <v-card-title class="d-flex align-center pe-2">
       <v-icon
         icon="mdi-phone"
-        class="text-start font-weight-semibold text-primary"
-      ></v-icon>
+        class="text-start font-weight-semibold text-primary"></v-icon>
       &nbsp;&nbsp;&nbsp; FIND CONTROL ROOM&nbsp;&nbsp;&nbsp;&nbsp;
 
       <v-spacer></v-spacer>
@@ -18,8 +17,7 @@
         variant="solo-filled"
         flat
         hide-details
-        single-line
-      ></v-text-field>
+        single-line></v-text-field>
     </v-card-title>
 
     <v-divider></v-divider>
@@ -28,8 +26,7 @@
       :items="items"
       :items-per-page="6"
       :headers="headers"
-      hover
-    >
+      hover>
       <!-- control_id, name, contact -->
 
       <template #header.name>
@@ -55,8 +52,7 @@
               pa="7"
               color="red"
               class="icon"
-              @click="deleteControl(item.control_id)"
-            ></v-icon>
+              @click="deleteControl(item.control_id)"></v-icon>
           </div>
 
           <div class="edit">
