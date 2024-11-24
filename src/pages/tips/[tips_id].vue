@@ -24,7 +24,7 @@
               </div>
 
               <img
-                :src="`http://localhost:5000/imgs/` + form.file"
+                :src="`https://backendpsl.up.railway.app/uploads/` + form.file"
                 width="100%"
                 height="200"
               /><br /><br />
@@ -49,7 +49,9 @@
               <input type="text" v-model="form.title" placeholder="Title" />
               <div class="image">
                 <VAvatar
-                  :image="'http://localhost:5000/imgs/' + form.file"
+                  :image="
+                    'https://backendpsl.up.railway.app/uploads/' + form.file
+                  "
                 ></VAvatar
                 ><input
                   type="file"
@@ -90,7 +92,7 @@
 <script setup>
 import { ref, reactive, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import axios from "axios";
+import api from "@/axios";
 import { useToast } from "vue-toastification";
 
 const router = useRouter();
@@ -111,7 +113,7 @@ const tips_id = route.params.tips_id;
 const toast = useToast();
 async function fetch() {
   try {
-    const response = await axios.get(`http://localhost:5000/tips/${tips_id}`);
+    const response = await api.get(`/tips/${tips_id}`);
     var data = response.data;
 
     form.title = data.title || "kk";
@@ -148,15 +150,11 @@ const submitForm = async () => {
       formData.append("file", filedata.value);
     }
 
-    const response = await axios.put(
-      `http://localhost:5000/tips/${tips_id}`,
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
-    );
+    const response = await api.put(`/tips/${tips_id}`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
     loading.value = false;
     toast.success("News updated successfully!");
     fetch();

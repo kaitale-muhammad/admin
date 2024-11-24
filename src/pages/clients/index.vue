@@ -109,7 +109,7 @@
 
 <script setup>
 import ClientWrapper from "@/components/clientWrapper.vue";
-import axios from "axios";
+import api from "@/axios";
 import { onMounted, ref, defineProps } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useToast } from "vue-toastification";
@@ -143,7 +143,7 @@ const headers = ref([
 
 const fetchData = async () => {
   try {
-    const response = await axios.get("http://localhost:5000/clients");
+    const response = await api.get("/clients");
     items.value = response.data;
   } catch (error) {
     console.error(error);
@@ -171,7 +171,7 @@ const deleteClients = async (id) => {
 
     // If the user confirms deletion, proceed
     if (result.isConfirmed) {
-      await axios.delete(`http://localhost:5000/clients/${id}`);
+      await api.delete(`/clients/${id}`);
       toast.success("Deleted successfully");
       fetchData(); // Reload or fetch updated data
     }

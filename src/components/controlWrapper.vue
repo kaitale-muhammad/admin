@@ -7,7 +7,7 @@
             v-bind="activatorProps"
             prepend-icon="mdi-plus"
             color="green"
-            text="add Control Room"
+            text="Add Control Room"
           ></v-btn>
         </template>
 
@@ -20,15 +20,17 @@
                 type="text"
                 v-model="form.name"
                 placeholder="Name"
-                name="by"
-                id="by"
+                name="name"
+                id="name"
+                required
               /><br />
               <input
                 type="text"
                 v-model="form.contact"
                 placeholder="Contact"
-                name="by"
-                id="by"
+                name="contact"
+                id="contact"
+                required
               /><br />
 
               <v-btn
@@ -37,8 +39,9 @@
                 color="primary"
                 @click="isActive.value = false"
                 block
-                >Add</v-btn
               >
+                Add
+              </v-btn>
             </v-form>
 
             <v-card-actions class="justify-end">
@@ -57,15 +60,7 @@
       </v-dialog>
     </div>
     <hr />
-
-    <!-- <slot /> -->
-    <!-- {{ service_name }}
-                {{ image }}
-                {{ description }} -->
   </div>
-  <!-- <div v-for="data in data" :key="data.id">
-                {{ data.service_name }}
-              </div> -->
 </template>
 
 <style scoped>
@@ -80,7 +75,7 @@
 input {
   width: 100%;
   padding: 10px;
-  border: 1px solid blue;
+  border: 1px blue;
   border-radius: 5px;
   outline: 1px solid blue;
   margin-bottom: 10px;
@@ -89,7 +84,7 @@ input {
 textarea {
   width: 100%;
   padding: 10px;
-  border: 1px solid blue;
+  border: 1px blue;
   border-radius: 5px;
   outline: 1px solid blue;
   margin-bottom: 10px;
@@ -102,35 +97,45 @@ textarea {
 </style>
 
 <script setup>
-import axios from "axios";
-import { ref, reactive, onMounted, defineProps } from "vue";
-import { useRouter } from "vue-router";
+import api from "@/axios";
+import { ref, reactive } from "vue";
 import { useToast } from "vue-toastification";
-// const loading = ref(true);
-// let data = ref(undefined);
-const loading = ref(false);
-const router = useRouter();
-const toast = useToast();
 
-const editing = false;
+const loading = ref(false);
+const toast = useToast();
 
 const form = reactive({
   name: "",
   contact: "",
 });
 
-// control_id, name, contact
+// Form validation
+const validateForm = () => {
+  if (!form.name) {
+    toast.error("Name is required.");
+    return false;
+  }
+  if (!form.contact) {
+    toast.error("Contact is required.");
+    return false;
+  }
+  return true;
+};
 
 const submitForm = async () => {
+  // Validate form before submitting
+  if (!validateForm()) {
+    return; // Stop form submission if validation fails
+  }
+
   loading.value = true;
+
   try {
-    await axios.post(`http://localhost:5000/controls`, form);
+    await api.post(`/controls`, form);
     loading.value = false;
     toast.success("Control room added successfully!");
-    // isActive.value = false;
   } catch (error) {
     loading.value = false;
-    console.error(error);
     toast.error("Failed to add the Control Room");
   }
 };

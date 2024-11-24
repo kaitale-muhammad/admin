@@ -7,7 +7,7 @@
             v-bind="activatorProps"
             prepend-icon="mdi-plus"
             color="green"
-            text="add Event"
+            text="Add Event"
           ></v-btn>
         </template>
 
@@ -20,8 +20,9 @@
                 type="text"
                 v-model="form.title"
                 placeholder="Title"
-                name="service_name"
-                id="service_name"
+                name="title"
+                id="title"
+                required
               /><br />
               <input type="file" ref="file" @change="handleFileChange" /><br />
               <textarea
@@ -38,13 +39,15 @@
                 placeholder="Added By"
                 name="by"
                 id="by"
+                required
               /><br />
               <input
                 type="date"
                 v-model="form.date_to_occur"
                 placeholder="Date to Occur"
-                name="by"
-                id="by"
+                name="date_to_occur"
+                id="date_to_occur"
+                required
               /><br />
 
               <v-btn
@@ -53,8 +56,9 @@
                 color="primary"
                 @click="isActive.value = false"
                 block
-                >Add</v-btn
               >
+                Add
+              </v-btn>
             </v-form>
 
             <v-card-actions class="justify-end">
@@ -73,15 +77,7 @@
       </v-dialog>
     </div>
     <hr />
-
-    <!-- <slot /> -->
-    <!-- {{ service_name }}
-        {{ image }}
-        {{ description }} -->
   </div>
-  <!-- <div v-for="data in data" :key="data.id">
-        {{ data.service_name }}
-      </div> -->
 </template>
 
 <style scoped>
@@ -96,7 +92,7 @@
 input {
   width: 100%;
   padding: 10px;
-  border: 1px solid blue;
+  border: 1px blue;
   border-radius: 5px;
   outline: 1px solid blue;
   margin-bottom: 10px;
@@ -105,7 +101,7 @@ input {
 textarea {
   width: 100%;
   padding: 10px;
-  border: 1px solid blue;
+  border: 1px blue;
   border-radius: 5px;
   outline: 1px solid blue;
   margin-bottom: 10px;
@@ -118,17 +114,12 @@ textarea {
 </style>
 
 <script setup>
-import axios from "axios";
-import { ref, reactive, onMounted, defineProps } from "vue";
-import { useRouter } from "vue-router";
+import api from "@/axios";
+import { ref, reactive, onMounted } from "vue";
 import { useToast } from "vue-toastification";
-// const loading = ref(true);
-// let data = ref(undefined);
-const loading = ref(false);
-const router = useRouter();
-const toast = useToast();
 
-const editing = false;
+const loading = ref(false);
+const toast = useToast();
 
 const form = reactive({
   title: "",
@@ -138,11 +129,9 @@ const form = reactive({
   date_to_occur: "",
 });
 
-onMounted(() => {
-  fetch();
-});
-
 const filedata = ref("");
+
+// Handle file change
 const handleFileChange = (event) => {
   const file = event.target.files[0];
   if (file) {
@@ -150,49 +139,54 @@ const handleFileChange = (event) => {
   }
 };
 
+// Validate form data
+const validateForm = () => {
+  if (!form.title) {
+    toast.error("Title is required.");
+    return false;
+  }
+  if (!form.description) {
+    toast.error("Description is required.");
+    return false;
+  }
+  if (!form.date_to_occur) {
+    toast.error("Date to Occur is required.");
+    return false;
+  }
+  return true;
+};
+
+// Submit the form
 const submitForm = async () => {
+  // Validate before submission
+  if (!validateForm()) {
+    return; // Stop form submission if validation fails
+  }
+
   loading.value = true;
+
   try {
     const formData = new FormData();
     formData.append("title", form.title);
     formData.append("description", form.description);
-    formData.append("image", form.file);
     formData.append("added_by", form.by);
     formData.append("date_to_occur", form.date_to_occur);
 
+    // Append file if available
     if (filedata.value) {
       formData.append("file", filedata.value);
     }
 
-    const response = await axios.post(
-      `http://localhost:5000/events`,
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
-    );
+    const response = await api.post(`/events`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
     loading.value = false;
-    toast.success("Notes added successfully!");
-    // isActive.value = false;
-    fetch();
+    toast.success("Event added successfully!");
   } catch (error) {
     loading.value = false;
-    console.error(error);
-    toast.error("Failed to add the notesboard");
+    toast.error("Failed to add the event");
   }
 };
-
-// const onSubmit = async () => {
-//   const formData = new FormData();
-//   formData.append("file", this.file);
-
-//   try {
-//     await axios.post("http://localhost:5000/uploads", formData);
-//     this.message = "Uploaded Successsfully";
-//   } catch (err) {
-//     this.message = err.response.data.error;
-//   }
-// };
 </script>

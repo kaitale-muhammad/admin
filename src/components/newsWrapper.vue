@@ -7,7 +7,7 @@
             v-bind="activatorProps"
             prepend-icon="mdi-plus"
             color="green"
-            text="add News"
+            text="Add News"
           ></v-btn>
         </template>
 
@@ -20,8 +20,9 @@
                 type="text"
                 v-model="form.title"
                 placeholder="Title"
-                name="service_name"
-                id="service_name"
+                name="title"
+                id="title"
+                required
               /><br />
               <input type="file" ref="file" @change="handleFileChange" /><br />
               <textarea
@@ -38,6 +39,7 @@
                 placeholder="Added By"
                 name="by"
                 id="by"
+                required
               /><br />
 
               <v-btn
@@ -46,8 +48,9 @@
                 color="primary"
                 @click="isActive.value = false"
                 block
-                >Add</v-btn
               >
+                Add
+              </v-btn>
             </v-form>
 
             <v-card-actions class="justify-end">
@@ -66,15 +69,7 @@
       </v-dialog>
     </div>
     <hr />
-
-    <!-- <slot /> -->
-    <!-- {{ service_name }}
-          {{ image }}
-          {{ description }} -->
   </div>
-  <!-- <div v-for="data in data" :key="data.id">
-          {{ data.service_name }}
-        </div> -->
 </template>
 
 <style scoped>
@@ -89,7 +84,7 @@
 input {
   width: 100%;
   padding: 10px;
-  border: 1px solid blue;
+  border: 1px blue;
   border-radius: 5px;
   outline: 1px solid blue;
   margin-bottom: 10px;
@@ -98,7 +93,7 @@ input {
 textarea {
   width: 100%;
   padding: 10px;
-  border: 1px solid blue;
+  border: 1px blue;
   border-radius: 5px;
   outline: 1px solid blue;
   margin-bottom: 10px;
@@ -111,17 +106,13 @@ textarea {
 </style>
 
 <script setup>
-import axios from "axios";
+import api from "@/axios";
 import { ref, reactive, onMounted, defineProps } from "vue";
 import { useRouter } from "vue-router";
 import { useToast } from "vue-toastification";
-// const loading = ref(true);
-// let data = ref(undefined);
-const loading = ref(false);
-const router = useRouter();
-const toast = useToast();
 
-const editing = false;
+const loading = ref(false);
+const toast = useToast();
 
 const form = reactive({
   title: "",
@@ -143,8 +134,32 @@ const handleFileChange = (event) => {
   }
 };
 
+// Validate form data
+const validateForm = () => {
+  if (!form.title) {
+    toast.error("Title is required.");
+    return false;
+  }
+  if (!form.description) {
+    toast.error("Description is required.");
+    return false;
+  }
+  if (!form.by) {
+    toast.error("Added By is required.");
+    return false;
+  }
+  return true;
+};
+
+// Submit the form
 const submitForm = async () => {
+  // Validate before submission
+  if (!validateForm()) {
+    return; // Stop form submission if validation fails
+  }
+
   loading.value = true;
+
   try {
     const formData = new FormData();
     formData.append("title", form.title);
@@ -152,35 +167,21 @@ const submitForm = async () => {
     formData.append("image", form.file);
     formData.append("added_by", form.by);
 
+    // Append file if available
     if (filedata.value) {
       formData.append("file", filedata.value);
     }
 
-    const response = await axios.post(`http://localhost:5000/news`, formData, {
+    const response = await api.post(`/news`, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
     });
     loading.value = false;
     toast.success("News added successfully!");
-    // isActive.value = false;
-    fetch();
   } catch (error) {
     loading.value = false;
-    console.error(error);
     toast.error("Failed to add the news");
   }
 };
-
-// const onSubmit = async () => {
-//   const formData = new FormData();
-//   formData.append("file", this.file);
-
-//   try {
-//     await axios.post("http://localhost:5000/uploads", formData);
-//     this.message = "Uploaded Successsfully";
-//   } catch (err) {
-//     this.message = err.response.data.error;
-//   }
-// };
 </script>

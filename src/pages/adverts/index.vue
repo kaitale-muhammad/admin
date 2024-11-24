@@ -76,7 +76,7 @@
       <template #item.image="{ item }">
         <v-card class="my-2" elevation="2" rounded style="width: 80px">
           <img
-            :src="`http://localhost:5000/imgs/${item.image}`"
+            :src="`https://backendpsl.up.railway.app/uploads/${item.image}`"
             width="80"
             height="80"
             @click="openImageDialog(item.image)"
@@ -106,7 +106,7 @@
 
 <script setup>
 import advertWrapper from "@/components/advertWrapper.vue";
-import axios from "axios";
+import api from "@/axios";
 import { onMounted, ref } from "vue";
 import { useToast } from "vue-toastification";
 import Swal from "sweetalert2";
@@ -139,7 +139,7 @@ const headers = ref([
 // Fetch data function with error handling
 const fetchData = async () => {
   try {
-    const response = await axios.get("http://localhost:5000/adverts");
+    const response = await api.get("/adverts");
     items.value = response.data;
   } catch (error) {
     console.error(error);
@@ -166,7 +166,7 @@ const deleteAdvert = async (advert_id) => {
     });
 
     if (result.isConfirmed) {
-      await axios.delete(`http://localhost:5000/adverts/${advert_id}`);
+      await api.delete(`/adverts/${advert_id}`);
       toast.success("Deleted successfully");
       fetchData(); // Refresh the data after deletion
     }
@@ -178,7 +178,7 @@ const deleteAdvert = async (advert_id) => {
 
 // Open image dialog on click
 const openImageDialog = (image) => {
-  dialogImage.value = `http://localhost:5000/imgs/${image}`;
+  dialogImage.value = `https://backendpsl.up.railway.app/uploads/${image}`;
   imageDialog.value = true;
 };
 </script>

@@ -7,7 +7,7 @@
             v-bind="activatorProps"
             prepend-icon="mdi-plus"
             color="green"
-            text="add Service"
+            text="Add Service"
           ></v-btn>
         </template>
 
@@ -22,6 +22,7 @@
                 placeholder="Service Name"
                 name="service_name"
                 id="service_name"
+                required
               /><br />
               <input type="file" ref="file" @change="handleFileChange" /><br />
               <textarea
@@ -38,15 +39,8 @@
                 name="status"
                 id="statuss"
                 placeholder="Status"
+                required
               /><br />
-
-              <!-- <div>
-                <v-checkbox
-                  label="Featured"
-                  v-model="check"
-                  value="1"
-                ></v-checkbox>
-              </div> -->
 
               <v-btn
                 class="mt-2"
@@ -54,8 +48,9 @@
                 color="primary"
                 @click="isActive.value = false"
                 block
-                >{{ editing ? "Update" : "Add" }}</v-btn
               >
+                {{ editing ? "Update" : "Add" }}
+              </v-btn>
             </v-form>
 
             <v-card-actions class="justify-end">
@@ -74,15 +69,7 @@
       </v-dialog>
     </div>
     <hr />
-
-    <!-- <slot /> -->
-    <!-- {{ service_name }}
-    {{ image }}
-    {{ description }} -->
   </div>
-  <!-- <div v-for="data in data" :key="data.id">
-    {{ data.service_name }}
-  </div> -->
 </template>
 
 <style scoped>
@@ -97,7 +84,7 @@
 input {
   width: 100%;
   padding: 10px;
-  border: 1px solid blue;
+  border: 1px blue;
   border-radius: 5px;
   outline: 1px solid blue;
   margin-bottom: 10px;
@@ -106,7 +93,7 @@ input {
 textarea {
   width: 100%;
   padding: 10px;
-  border: 1px solid blue;
+  border: 1px blue;
   border-radius: 5px;
   outline: 1px solid blue;
   margin-bottom: 10px;
@@ -119,14 +106,12 @@ textarea {
 </style>
 
 <script setup>
-import axios from "axios";
+import api from "@/axios";
 import { ref, reactive, onMounted, defineProps } from "vue";
 import { useRouter } from "vue-router";
 import { useToast } from "vue-toastification";
-// const loading = ref(true);
-// let data = ref(undefined);
+
 const loading = ref(false);
-const router = useRouter();
 const toast = useToast();
 
 const editing = false;
@@ -145,6 +130,7 @@ const form = reactive({
   description: "",
   status: "",
 });
+
 const check = ref(false);
 
 onMounted(() => {
@@ -159,48 +145,53 @@ const handleFileChange = (event) => {
   }
 };
 
+// Validate form data
+const validateForm = () => {
+  if (!form.service_name) {
+    toast.error("Service Name is required.");
+    return false;
+  }
+  if (!form.description) {
+    toast.error("Description is required.");
+    return false;
+  }
+  if (!form.status) {
+    toast.error("Status is required.");
+    return false;
+  }
+  return true;
+};
+
+// Submit the form
 const submitForm = async () => {
+  // Validate before submission
+  if (!validateForm()) {
+    return; // Stop form submission if validation fails
+  }
+
   loading.value = true;
+
   try {
     const formData = new FormData();
     formData.append("service_name", form.service_name);
     formData.append("description", form.description);
     formData.append("status", form.status);
-    formData.append("image", form.file);
 
+    // Append file if available
     if (filedata.value) {
       formData.append("file", filedata.value);
     }
 
-    const response = await axios.post(
-      `http://localhost:5000/addservices`,
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
-    );
+    const response = await api.post(`/addservices`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
     loading.value = false;
     toast.success("Service added successfully!");
-    // isActive.value = false;
-    fetch();
   } catch (error) {
     loading.value = false;
-    console.error(error);
     toast.error("Failed to add the service");
   }
 };
-
-// const onSubmit = async () => {
-//   const formData = new FormData();
-//   formData.append("file", this.file);
-
-//   try {
-//     await axios.post("http://localhost:5000/uploads", formData);
-//     this.message = "Uploaded Successsfully";
-//   } catch (err) {
-//     this.message = err.response.data.error;
-//   }
-// };
 </script>

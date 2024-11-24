@@ -30,8 +30,9 @@
 <script setup>
 import { ref, reactive } from "vue";
 import { useRouter } from "vue-router";
-import axios from "axios";
+import api from "@/axios";
 import { useToast } from "vue-toastification";
+import Cookies from "js-cookie"; // Import js-cookie
 
 const router = useRouter();
 const form = reactive({
@@ -44,24 +45,27 @@ const toast = useToast();
 const login = async () => {
   loading.value = true;
   try {
-    // Simulate a login API request
-    const response = await axios.post("http://localhost:5000/admin", {
+    const response = await api.post("/admin", {
       email: form.email,
       password: form.password,
     });
-    if ((form.email != "") | (form.password != "")) {
-      if (response.data.success) {
-        const user = { email: response.data.id, token: response.data.token };
-        localStorage.setItem("user", JSON.stringify(user));
-        toast.success("Login successful");
-        router.push({ path: "/" });
-      } else {
-        toast.error("Invalid credentials");
-      }
+
+    // console.log("Response from backend:", response.data);
+
+    // Check if the backend sends a success message and token
+    if (response.status === 200 && response.data.token) {
+      const user = { email: form.email, token: response.data.token };
+      Cookies.set("auth_token", response.data.token, { expires: 1 });
+
+      toast.success("Login successful");
+
+      // Redirect to the dashboard
+      router.push({ path: "/" });
     } else {
-      toast.error("All fields are required");
+      toast.error("Invalid credentials");
     }
   } catch (error) {
+    console.error("Error during login:", error);
     toast.error("Invalid credentials");
   } finally {
     loading.value = false;

@@ -89,7 +89,7 @@
       <template #item.image="{ item }">
         <v-card class="my-2" elevation="2" rounded style="width: 80px">
           <img
-            :src="`http://localhost:5000/imgs/${item.image}`"
+            :src="`https://backendpsl.up.railway.app/uploads/${item.image}`"
             width="80"
             height="80"
             @click="showImageDialog(item.image)"
@@ -107,7 +107,7 @@
     <v-dialog v-model="dialog" max-width="500px">
       <v-card style="padding: 10px">
         <v-img
-          :src="`http://localhost:5000/imgs/${selectedImage}`"
+          :src="`https://backendpsl.up.railway.app/uploads/${selectedImage}`"
           height="400px"
         />
         <v-card-actions>
@@ -120,7 +120,7 @@
 
 <script setup>
 import TipsWrapper from "@/components/tipsWrapper.vue";
-import axios from "axios";
+import api from "@/axios";
 import { onMounted, ref } from "vue";
 import { useToast } from "vue-toastification";
 import Swal from "sweetalert2";
@@ -145,7 +145,7 @@ const headers = ref([
 // Fetch data function with error handling
 const fetchData = async () => {
   try {
-    const response = await axios.get("http://localhost:5000/tips");
+    const response = await api.get("/tips");
     items.value = response.data;
   } catch (error) {
     console.error(error);
@@ -172,7 +172,7 @@ const deleteTip = async (tips_id) => {
     });
 
     if (result.isConfirmed) {
-      await axios.delete(`http://localhost:5000/tips/${tips_id}`);
+      await api.delete(`/tips/${tips_id}`);
       toast.success("Deleted successfully");
       fetchData(); // Refresh the data after deletion
     }

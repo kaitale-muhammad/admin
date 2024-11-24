@@ -12,6 +12,7 @@
     "axios": "^1.7.7",
     "chart.js": "^4.4.6",
     "core-js": "^3.37.1",
+    "js-cookie": "^3.0.5",
     "pinia": "^2.2.5",
     "roboto-fontface": "*",
     "sweetalert2": "^11.14.5",

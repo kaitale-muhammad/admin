@@ -113,12 +113,23 @@
                 name="email"
               />
               <p>date joined</p>
-              <input
-                type="date"
-                v-model="form.date_joined"
-                placeholder="Date joined"
-                name="name"
-              />
+              <div id="title">
+                <input
+                  type="date"
+                  v-model="form.date_joined"
+                  placeholder="Date joined"
+                  name="date_joined"
+                  required
+                />
+
+                <input
+                  type="text"
+                  v-model="form.title"
+                  placeholder="Title"
+                  name="name"
+                  required
+                />
+              </div>
               <!-- <input
           type="number"
           v-model="form.site"
@@ -164,7 +175,7 @@
 <script setup>
 import { ref, reactive, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import axios from "axios";
+import api from "@/axios";
 import { useToast } from "vue-toastification";
 
 const router = useRouter();
@@ -177,6 +188,7 @@ const form = reactive({
   contact: "",
   email: "",
   date_joined: "",
+  title: "",
   site: "",
   supervisor: "",
 });
@@ -190,7 +202,7 @@ const id = route.params.id;
 const toast = useToast();
 async function fetch() {
   try {
-    const response = await axios.get(`http://localhost:5000/workers/${id}`);
+    const response = await api.get(`/workers/${id}`);
     var data = response.data;
 
     form.worker_id = data.worker_id || "kk";
@@ -200,6 +212,7 @@ async function fetch() {
     form.contact = data.contact || "";
     form.email = data.email || "";
     form.date_joined = data.date_joined || "";
+    form.title = data.title || "";
     form.site = data.site || "";
     // Set supervisor to true if it's 1, otherwise false
     form.supervisor = data.supervisor === 1;
@@ -229,6 +242,7 @@ const submitForm = async () => {
     formData.append("contact", form.contact);
     formData.append("email", form.email);
     formData.append("date_joined", form.date_joined);
+    formData.append("title", form.title);
     formData.append("site", form.site);
     // If supervisor is true, save as "1", otherwise "0"
     formData.append("supervisor", form.supervisor ? "1" : "0");
@@ -239,15 +253,11 @@ const submitForm = async () => {
       formData.append("file", filedata.value);
     }
 
-    const response = await axios.put(
-      `http://localhost:5000/workers/${id}`,
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
-    );
+    const response = await api.put(`/workers/${id}`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
     loading.value = false;
     toast.success("Worker updated successfully!");
     fetch();
@@ -355,5 +365,11 @@ textarea {
 
 .supervisor-checkbox p {
   margin: 0;
+}
+div #title {
+  display: flex;
+}
+div #title input {
+  margin-left: 10px;
 }
 </style>

@@ -10,99 +10,100 @@
             text="Add Client Info"
           ></v-btn>
         </template>
-        <!-- id, name, contact, email, location, man_power, gun, baton, touch, radio_call, occurance_book, date_added -->
 
         <template v-slot:default="{ isActive }">
           <v-card align-center>
-            <!-- <v-toolbar title="Add Client Info"></v-toolbar> -->
-
             <v-form @submit.prevent="submitForm" class="pa-4 form">
               <input
                 type="text"
                 v-model="form.name"
                 placeholder="Name"
-                name="by"
-                id="by"
+                name="name"
+                id="name"
+                required
               /><br />
               <input
                 type="text"
                 v-model="form.contact"
                 placeholder="Contact"
-                name="by"
-                id="by"
-              /><br /><input
+                name="contact"
+                id="contact"
+                required
+              /><br />
+              <input
                 type="email"
                 v-model="form.email"
                 placeholder="Email"
-                name="by"
-                id="by"
+                name="email"
+                id="email"
+                required
               /><br />
               <input
                 type="text"
                 v-model="form.site_name"
                 placeholder="Site Name"
-                name="by"
-                id="by"
+                name="site_name"
+                id="site_name"
+                required
               />
               <input
                 type="text"
                 v-model="form.location"
                 placeholder="Location"
-                name="by"
-                id="by"
+                name="location"
+                id="location"
+                required
               />
               <div class="requirements">
-                <!-- man_power, gun,dog, baton, touch, radio_call, occurance_book, -->
                 <input
                   type="number"
                   v-model="form.man_power"
-                  placeholder="man power"
+                  placeholder="Man Power"
                   name="man_power"
-                  id="by"
-                  autocomplete="no"
-                /><input
+                  id="man_power"
+                />
+                <input
                   type="number"
                   v-model="form.gun"
                   placeholder="Gun"
-                  name="by"
-                  id="by"
-                  autocomplete="no"
-                /><input
+                  name="gun"
+                  id="gun"
+                />
+                <input
                   type="number"
                   v-model="form.dog"
                   placeholder="Dog"
-                  name="by"
-                  id="by"
-                  autocomplete="no"
-                /><input
+                  name="dog"
+                  id="dog"
+                />
+                <input
                   type="number"
                   v-model="form.baton"
                   placeholder="Baton"
-                  name="by"
-                  id="by"
-                  autocomplete="no"
-                /><input
+                  name="baton"
+                  id="baton"
+                />
+                <input
                   type="number"
                   v-model="form.touch"
                   placeholder="Touch"
-                  name="by"
-                  id="by"
-                  autocomplete="no"
-                /><input
+                  name="touch"
+                  id="touch"
+                />
+                <input
                   type="number"
                   v-model="form.radio_call"
-                  placeholder="Radio call"
-                  name="by"
-                  id="by"
-                  autocomplete="no"
+                  placeholder="Radio Call"
+                  name="radio_call"
+                  id="radio_call"
                 />
               </div>
               <input
                 type="text"
                 v-model="form.others"
                 placeholder="Others"
-                name="by"
-                id="by"
+                name="others"
+                id="others"
               />
               <v-btn
                 class="mt-2"
@@ -113,7 +114,7 @@
                 >Add</v-btn
               >
             </v-form>
-            <!-- id, name, contact, email, location, man_power, gun, baton, touch, radio_call, occurance_book, date_added -->
+
             <v-card-actions class="justify-end">
               <v-btn
                 class="text-white text-none rounded-md"
@@ -145,7 +146,7 @@
 input {
   width: 100%;
   padding: 7px;
-  border: 1px solid blue;
+  border: 1px blue;
   border-radius: 5px;
   outline: 1px solid blue;
   margin-bottom: 10px;
@@ -175,17 +176,12 @@ textarea {
 </style>
 
 <script setup>
-import axios from "axios";
-import { ref, reactive, onMounted, defineProps } from "vue";
-import { useRouter } from "vue-router";
+import api from "@/axios";
+import { ref, reactive, onMounted } from "vue";
 import { useToast } from "vue-toastification";
-// const loading = ref(true);
-// let data = ref(undefined);
-const loading = ref(false);
-const router = useRouter();
-const toast = useToast();
 
-const editing = false;
+const loading = ref(false);
+const toast = useToast();
 
 const form = reactive({
   name: "",
@@ -202,17 +198,55 @@ const form = reactive({
   others: "",
 });
 
+// Form validation
+const validateForm = () => {
+  if (!form.name) {
+    toast.error("Name is required.");
+    return false;
+  }
+  if (!form.contact) {
+    toast.error("Contact is required.");
+    return false;
+  }
+  if (!form.email) {
+    toast.error("Email is required.");
+    return false;
+  }
+  if (!form.site_name) {
+    toast.error("Site Name is required.");
+    return false;
+  }
+  if (!form.location) {
+    toast.error("Location is required.");
+    return false;
+  }
+  return true;
+};
+
 const submitForm = async () => {
+  // Validate form before submitting
+  if (!validateForm()) {
+    return; // Stop form submission if validation fails
+  }
+
   loading.value = true;
+
+  // Set empty numeric fields to 0
+  form.man_power = form.man_power || 0;
+  form.gun = form.gun || 0;
+  form.dog = form.dog || 0;
+  form.baton = form.baton || 0;
+  form.touch = form.touch || 0;
+  form.radio_call = form.radio_call || 0;
+
   try {
-    await axios.post(`http://localhost:5000/clients`, form);
+    await api.post(`/clients`, form);
     loading.value = false;
     toast.success("Client added successfully!");
-    // isActive.value = false;
+    fetch(); // Refresh the list of clients
   } catch (error) {
     loading.value = false;
-    console.error(error);
-    toast.error("Failed to add the client");
+    toast.error("Failed to add the client.");
   }
 };
 </script>

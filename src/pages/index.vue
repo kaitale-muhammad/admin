@@ -19,34 +19,38 @@
             <v-card-title class="text-h6">
               <div style="display: flex; justify-content: space-between">
                 Total Application Users
-                <v-icon>mdi-account-group</v-icon>
+                <v-icon class="text-primary">mdi-account-group</v-icon>
               </div>
             </v-card-title>
             <hr />
             <v-card-text>
-              <h1>{{ totalusers }}</h1>
+              <h1 class="text-primary">{{ totalusers }}</h1>
             </v-card-text>
           </v-card>
           <v-card class="mx-1" id="vs">
             <v-card-title class="text-h6">
               <div style="display: flex; justify-content: space-between">
-                Total Workers <v-icon>mdi-account-hard-hat-outline</v-icon>
+                Total Workers
+                <v-icon class="text-primary"
+                  >mdi-account-hard-hat-outline</v-icon
+                >
               </div>
             </v-card-title>
             <hr />
             <v-card-text>
-              <h2>{{ totalworkers }}</h2>
+              <h2 class="text-primary">{{ totalworkers }}</h2>
             </v-card-text>
           </v-card>
           <v-card class="mx-1" id="vs">
             <v-card-title class="text-h6">
               <div style="display: flex; justify-content: space-between">
-                Total Clients <v-icon>mdi-handshake-outline</v-icon>
+                Total Clients
+                <v-icon class="text-primary">mdi-handshake-outline</v-icon>
               </div>
             </v-card-title>
             <hr />
             <v-card-text>
-              <h2>{{ totalclients }}</h2>
+              <h2 class="text-primary">{{ totalclients }}</h2>
             </v-card-text>
           </v-card>
         </v-col>
@@ -100,7 +104,7 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
-import axios from "axios";
+import api from "@/axios";
 import Chart from "chart.js/auto";
 
 const totalusers = ref("");
@@ -134,7 +138,7 @@ onMounted(async () => {
   // total app users
 
   try {
-    const response = await axios.get("http://localhost:5000/appusers");
+    const response = await api.get("/appusers");
 
     const responseData = response.data[0].users;
     totalusers.value = responseData;
@@ -143,7 +147,7 @@ onMounted(async () => {
   }
   // Total clients
   try {
-    const response = await axios.get("http://localhost:5000/sumclients");
+    const response = await api.get("/sumclients");
 
     const responseData = response.data[0].clients;
     totalclients.value = responseData;
@@ -153,7 +157,7 @@ onMounted(async () => {
 
   // Total workers
   try {
-    const response = await axios.get("http://localhost:5000/sumworkers");
+    const response = await api.get("/sumworkers");
 
     const responseData = response.data[0].workers;
     totalworkers.value = responseData;
@@ -163,7 +167,7 @@ onMounted(async () => {
   // workes VS users
 
   try {
-    const response = await axios.get("http://localhost:5000/users_workers");
+    const response = await api.get("/users_workers");
 
     const responseData = response.data[0];
     data3.value.labels = Object.keys(responseData);
@@ -198,7 +202,7 @@ onMounted(async () => {
   // Clients VS users
 
   try {
-    const response = await axios.get("http://localhost:5000/users_clients");
+    const response = await api.get("/users_clients");
 
     const responseData = response.data[0];
     data4.value.labels = Object.keys(responseData);
@@ -233,7 +237,7 @@ onMounted(async () => {
 
   /// bar
   try {
-    const response = await axios.get("http://localhost:5000/sarmmery");
+    const response = await api.get("/sarmmery");
 
     const responseData = response.data[0];
     data.value.labels = Object.keys(responseData);
@@ -299,7 +303,7 @@ onMounted(async () => {
 
   ////////
   try {
-    const response = await axios.get("http://localhost:5000/sarmmery");
+    const response = await api.get("/sarmmery");
 
     const responseData = response.data[0];
     data2.value.labels = Object.keys(responseData);

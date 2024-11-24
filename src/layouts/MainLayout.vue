@@ -84,9 +84,18 @@
 <script setup>
 import { ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import Cookies from "js-cookie"; // Import js-cookie
 
 const path = useRoute();
 const router = useRouter();
+
+// Check if the user is logged in via cookies
+const checkLoginStatus = () => {
+  const token = Cookies.get("auth_token");
+  if (!token) {
+    router.push("/login"); // Redirect to login page if no token is found
+  }
+};
 
 const getPath = () => {
   const pathname = path.name;
@@ -97,13 +106,15 @@ const getPath = () => {
 };
 
 const logout = () => {
-  localStorage.removeItem("user"); // Remove user data from local storage
-  router.push("/login");
+  // Remove the authentication token cookie
+  Cookies.remove("auth_token");
+  router.push("/login"); // Redirect to login page after logout
 };
 
 const settings = () => {
   router.push("/settings");
 };
+
 const drawer = ref(true);
 
 const items = ref([
@@ -152,11 +163,11 @@ const items = ref([
     prependIcon: "mdi-information-outline",
     link: "/tips",
   },
-  {
-    title: "Attendance",
-    prependIcon: "mdi-checkbox-marked-outline",
-    link: "/attendance",
-  },
+  // {
+  //   title: "Attendance",
+  //   prependIcon: "mdi-checkbox-marked-outline",
+  //   link: "/attendance",
+  // },
   {
     title: "Control Rooms",
     prependIcon: "mdi-phone",
@@ -168,6 +179,9 @@ const items = ref([
     link: "/adverts",
   },
 ]);
+
+// Check login status when the layout is loaded
+checkLoginStatus();
 </script>
 
 <style scoped>

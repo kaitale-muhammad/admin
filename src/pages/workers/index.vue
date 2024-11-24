@@ -47,11 +47,7 @@
       <template #header.date_of_birth>
         <div class="text-start font-weight-semibold text-primary">DOB</div>
       </template>
-      <template #header.date_added>
-        <div class="text-start font-weight-semibold text-primary">
-          Date Added
-        </div>
-      </template>
+
       <template #header.contact>
         <div class="text-start font-weight-semibold text-primary">Contact</div>
       </template>
@@ -62,6 +58,9 @@
         <div class="text-start font-weight-semibold text-primary">
           Date joined
         </div>
+      </template>
+      <template #header.title>
+        <div class="text-start font-weight-semibold text-primary">Title</div>
       </template>
       <template #header.site>
         <div class="text-start font-weight-semibold text-primary">
@@ -133,11 +132,13 @@
       <template #item.image="{ item }">
         <v-card class="my-2" elevation="2" rounded style="width: 60px">
           <img
+            v-if="item.image"
             :src="`http://localhost:5000/imgs/${item.image}`"
             width="60"
             height="60"
             @click="openImageDialog(item.image)"
           />
+          <img v-else src="/avater.jpg" width="60" height="60" />
         </v-card>
       </template>
     </v-data-table>
@@ -159,7 +160,7 @@
 
 <script setup>
 import WorkersWrapper from "@/components/workersWrapper.vue";
-import axios from "axios";
+import api from "@/axios";
 import { onMounted, ref, defineProps } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useToast } from "vue-toastification";
@@ -182,13 +183,14 @@ const headers = ref([
   { text: "contact", value: "contact" },
   { text: "email", value: "email" },
   { text: "date_joined", value: "date_joined" },
+  { text: "title", value: "title" },
   { text: "Client ID", value: "site" },
   { text: "Actions", value: "actions" },
 ]);
 
 const fetchData = async () => {
   try {
-    const response = await axios.get("http://localhost:5000/workers");
+    const response = await api.get("/workers");
     items.value = response.data; // Assuming response data is an array of items
   } catch (error) {
     console.error(error);
@@ -216,7 +218,7 @@ const deleteWorker = async (id) => {
 
     // If the user confirms deletion, proceed
     if (result.isConfirmed) {
-      await axios.delete(`http://localhost:5000/workers/${id}`);
+      await api.delete(`/workers/${id}`);
       toast.success("Deleted successfully");
       fetchData(); // Reload or fetch updated data
     }

@@ -135,7 +135,7 @@
 <script setup>
 import { ref, reactive, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import axios from "axios";
+import api from "@/axios";
 import { useToast } from "vue-toastification";
 
 const router = useRouter();
@@ -163,7 +163,7 @@ const id = route.params.id;
 const toast = useToast();
 async function fetch() {
   try {
-    const response = await axios.get(`http://localhost:5000/clients/${id}`);
+    const response = await api.get(`/clients/${id}`);
     var data = response.data;
     // id, name, contact, email, location, man_power, gun, dog, baton, touch, radio_call, date_added
     form.name = data.name || "";
@@ -190,8 +190,17 @@ onMounted(async () => {
 });
 const submitForm = async () => {
   loading.value = true;
+
+  // Set empty numeric fields to 0
+  form.man_power = form.man_power || 0;
+  form.gun = form.gun || 0;
+  form.dog = form.dog || 0;
+  form.baton = form.baton || 0;
+  form.touch = form.touch || 0;
+  form.radio_call = form.radio_call || 0;
+
   try {
-    await axios.put(`http://localhost:5000/clients/${id}`, form);
+    await api.put(`/clients/${id}`, form);
     loading.value = false;
     toast.success("Updated successfully!");
     fetch();

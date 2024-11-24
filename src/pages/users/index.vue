@@ -106,6 +106,7 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
+import api from "@/axios";
 import axios from "axios";
 
 const search = ref("");
@@ -126,7 +127,8 @@ const headers = ref([
 // Fetch data from the server
 const fetchData = async () => {
   try {
-    const response = await axios.get("http://localhost:5000/allusers");
+    const response = await api.get("/allusers");
+    // const response = await axios.get("/allusers");
     items.value = response.data;
   } catch (error) {
     console.error(error);

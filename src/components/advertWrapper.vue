@@ -31,6 +31,7 @@
                 placeholder="Added By"
                 name="by"
                 id="by"
+                required
               /><br />
 
               <v-btn
@@ -59,15 +60,7 @@
       </v-dialog>
     </div>
     <hr />
-
-    <!-- <slot /> -->
-    <!-- {{ service_name }}
-              {{ image }}
-              {{ description }} -->
   </div>
-  <!-- <div v-for="data in data" :key="data.id">
-              {{ data.service_name }}
-            </div> -->
 </template>
 
 <style scoped>
@@ -82,7 +75,7 @@
 input {
   width: 100%;
   padding: 10px;
-  border: 1px solid blue;
+  border: 1px blue;
   border-radius: 5px;
   outline: 1px solid blue;
   margin-bottom: 10px;
@@ -91,7 +84,7 @@ input {
 textarea {
   width: 100%;
   padding: 10px;
-  border: 1px solid blue;
+  border: 1px blue;
   border-radius: 5px;
   outline: 1px solid blue;
   margin-bottom: 10px;
@@ -104,27 +97,20 @@ textarea {
 </style>
 
 <script setup>
-import axios from "axios";
+import api from "@/axios";
 import { ref, reactive, onMounted, defineProps } from "vue";
 import { useRouter } from "vue-router";
 import { useToast } from "vue-toastification";
-// const loading = ref(true);
-// let data = ref(undefined);
+
 const loading = ref(false);
 const router = useRouter();
 const toast = useToast();
-
-const editing = false;
 
 const form = reactive({
   file: "",
   description: "",
   by: "",
   date_to_occur: "",
-});
-
-onMounted(() => {
-  fetch();
 });
 
 const filedata = ref("");
@@ -135,9 +121,29 @@ const handleFileChange = (event) => {
   }
 };
 
-// advert_id, image, description, added_by, date_added
+// Form validation logic
+const validateForm = () => {
+  if (!form.description) {
+    toast.error("Description is required.");
+    return false;
+  }
+  if (!form.by) {
+    toast.error("Added By is required.");
+    return false;
+  }
+  if (!filedata.value) {
+    toast.error("Image file is required.");
+    return false;
+  }
+  return true;
+};
 
 const submitForm = async () => {
+  // Validate form before submitting
+  if (!validateForm()) {
+    return; // Stop form submission if validation fails
+  }
+
   loading.value = true;
   try {
     const formData = new FormData();
@@ -149,23 +155,18 @@ const submitForm = async () => {
       formData.append("file", filedata.value);
     }
 
-    const response = await axios.post(
-      `http://localhost:5000/adverts`,
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
-    );
+    const response = await api.post(`/adverts`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
     loading.value = false;
-    toast.success("News added successfully!");
-    // isActive.value = false;
-    fetch();
+    toast.success("Advert added successfully!");
+    fetch(); // Refresh the list of adverts
   } catch (error) {
     loading.value = false;
     console.error(error);
-    toast.error("Failed to add the news");
+    toast.error("Failed to add the advert");
   }
 };
 </script>

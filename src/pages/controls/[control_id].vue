@@ -61,7 +61,7 @@
 <script setup>
 import { ref, reactive, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import axios from "axios";
+import api from "@/axios";
 import { useToast } from "vue-toastification";
 
 const router = useRouter();
@@ -80,9 +80,7 @@ const control_id = route.params.control_id;
 const toast = useToast();
 async function fetch() {
   try {
-    const response = await axios.get(
-      `http://localhost:5000/controls/${control_id}`
-    );
+    const response = await api.get(`/controls/${control_id}`);
     var data = response.data;
 
     form.name = data.name || "";
@@ -99,7 +97,7 @@ onMounted(async () => {
 const submitForm = async () => {
   loading.value = true;
   try {
-    await axios.put(`http://localhost:5000/controls/${control_id}`, form);
+    await api.put(`/controls/${control_id}`, form);
     loading.value = false;
     toast.success("Updated successfully!");
     fetch();

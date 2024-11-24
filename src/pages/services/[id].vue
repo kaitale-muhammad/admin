@@ -23,7 +23,7 @@
               </div>
 
               <img
-                :src="`http://localhost:5000/imgs/` + form.file"
+                :src="`https://backendpsl.up.railway.app/uploads/` + form.file"
                 width="100%"
                 height="200"
               /><br /><br />
@@ -51,7 +51,9 @@
               />
               <div class="image">
                 <VAvatar
-                  :image="'http://localhost:5000/imgs/' + form.file"
+                  :image="
+                    'https://backendpsl.up.railway.app/uploads/' + form.file
+                  "
                 ></VAvatar>
                 <input
                   type="file"
@@ -97,7 +99,7 @@
 <script setup>
 import { ref, reactive, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import axios from "axios";
+import api from "@/axios";
 import { useToast } from "vue-toastification";
 
 const router = useRouter();
@@ -120,7 +122,7 @@ const toast = useToast();
 
 async function fetch() {
   try {
-    const response = await axios.get(`http://localhost:5000/services/${id}`);
+    const response = await api.get(`/services/${id}`);
     var data = response.data;
 
     form.service_name = data.service_name || "kk";
@@ -160,15 +162,11 @@ const submitForm = async () => {
       formData.append("file", filedata.value);
     }
 
-    const response = await axios.put(
-      `http://localhost:5000/services/${id}`,
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
-    );
+    const response = await api.put(`/services/${id}`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
     loading.value = false;
     toast.success("Service updated successfully!");
     fetch();

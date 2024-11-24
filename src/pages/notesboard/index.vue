@@ -32,19 +32,23 @@
     >
       <!-- Custom Headers with Blue Color -->
       <template #header.image>
-        <div class="text-start" style="color: blue">Image</div>
+        <div class="text-start font-weight-semibold text-primary">Image</div>
       </template>
       <template #header.title>
-        <div class="text-start" style="color: blue">Title</div>
+        <div class="text-start font-weight-semibold text-primary">Title</div>
       </template>
       <template #header.description>
-        <div class="text-start" style="color: blue">Description</div>
+        <div class="text-start font-weight-semibold text-primary">
+          Description
+        </div>
       </template>
       <template #header.added_by>
-        <div class="text-start" style="color: blue">Added By</div>
+        <div class="text-start font-weight-semibold text-primary">Added By</div>
       </template>
       <template #header.date_added>
-        <div class="text-start" style="color: blue">Date Added</div>
+        <div class="text-start font-weight-semibold text-primary">
+          Date Added
+        </div>
       </template>
 
       <template #item.actions="{ item }">
@@ -82,7 +86,7 @@
           @click="openImageModal(item.image)"
         >
           <img
-            :src="`http://localhost:5000/imgs/${item.image}`"
+            :src="`https://backendpsl.up.railway.app/uploads/${item.image}`"
             width="80"
             height="80"
             style="cursor: pointer"
@@ -113,7 +117,7 @@
   </v-dialog>
 </template>
 <script setup>
-import axios from "axios";
+import api from "@/axios";
 import { onMounted, ref } from "vue";
 import { useToast } from "vue-toastification";
 import Swal from "sweetalert2";
@@ -139,7 +143,7 @@ const headers = ref([
 // Fetch data from API
 const fetchData = async () => {
   try {
-    const response = await axios.get("http://localhost:5000/notesboard");
+    const response = await api.get("/notesboard");
     items.value = response.data; // Assuming response data is an array of items
   } catch (error) {
     console.error(error);
@@ -165,7 +169,7 @@ const deleteService = async (id) => {
     });
 
     if (result.isConfirmed) {
-      await axios.delete(`http://localhost:5000/notesboard/${id}`);
+      await api.delete(`/notesboard/${id}`);
       fetchData();
       toast.success("Deleted successfully");
     }
@@ -176,7 +180,7 @@ const deleteService = async (id) => {
 
 // Function to open image modal
 const openImageModal = (image) => {
-  imageModalSrc.value = `http://localhost:5000/imgs/${image}`;
+  imageModalSrc.value = `https://backendpsl.up.railway.app/uploads/${image}`;
   showImageModal.value = true;
 };
 

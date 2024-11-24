@@ -72,10 +72,14 @@
       <template #item.image="{ item }">
         <v-card class="my-2" elevation="2" rounded style="width: 80px">
           <img
-            :src="`http://localhost:5000/imgs/${item.image}`"
+            :src="`https://backendpsl.up.railway.app/uploads/${item.image}`"
             width="80"
             height="80"
-            @click="openImageDialog(`http://localhost:5000/imgs/${item.image}`)"
+            @click="
+              openImageDialog(
+                `https://backendpsl.up.railway.app/uploads//${item.image}`
+              )
+            "
           />
         </v-card>
       </template>
@@ -99,7 +103,7 @@
 
 <script setup>
 import NewsWrapper from "@/components/newsWrapper.vue";
-import axios from "axios";
+import api from "@/axios";
 import { onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
 import { useToast } from "vue-toastification";
@@ -126,7 +130,7 @@ const headers = ref([
 // Fetch data from the API
 const fetchData = async () => {
   try {
-    const response = await axios.get("http://localhost:5000/news");
+    const response = await api.get("/news");
     items.value = response.data; // Assuming response data is an array of items
   } catch (error) {
     console.error(error);
@@ -152,7 +156,7 @@ const deleteNews = async (news_id) => {
     });
 
     if (result.isConfirmed) {
-      await axios.delete(`http://localhost:5000/news/${news_id}`);
+      await api.delete(`/news/${news_id}`);
       toast.success("Deleted successfully");
       fetchData(); // Reload or fetch updated data
     }

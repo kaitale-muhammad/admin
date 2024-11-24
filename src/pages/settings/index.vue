@@ -12,7 +12,7 @@
 
         <b>Email: </b> {{ form.email }}<br /><br />
         <hr />
-        <b>Password:</b> ****** <br />
+        <b>Password:</b>{{ form.password }} ****** <br />
       </VCard>
     </div>
 
@@ -25,11 +25,11 @@
     >
       <VForm @submit.prevent="submitForm">
         <input type="text" v-model="form.email" placeholder="Email" />
-        <input
+        <!-- <input
           type="password"
           v-model="form.password"
           placeholder="Current Password"
-        />
+        /> -->
         <input
           type="password"
           v-model="form.newpassword"
@@ -45,14 +45,15 @@
 <script setup>
 import { ref, reactive, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import axios from "axios";
+import api from "@/axios";
 import { useToast } from "vue-toastification";
+// import api from "js-cookie";
 
 const router = useRouter();
 const form = reactive({
   email: "",
   newpassword: "",
-  password: "",
+  // password: "",
 });
 const loading = ref(false);
 const toast = useToast();
@@ -63,10 +64,11 @@ const back = () => {
 
 async function fetch() {
   try {
-    const response = await axios.get("http://localhost:5000/admin");
+    const response = await api.get("/admin");
     const data = response.data;
 
     form.email = data[0].email || "";
+    // form.password = data[0].password || "";
   } catch (err) {
     console.error(err);
     toast.error("Failed to load admin");
@@ -80,20 +82,16 @@ onMounted(() => {
 const submitForm = async () => {
   loading.value = true;
   try {
-    const response = await axios.get("http://localhost:5000/admin");
+    const response = await api.get("/admin");
     const data = response.data;
 
-    if (form.password === data[0].password) {
-      await axios.put("http://localhost:5000/admin", {
-        email: form.email,
-        newpassword: form.newpassword,
-      });
-      loading.value = false;
-      toast.success("Updated successfully!");
-      fetch();
-    } else {
-      toast.error("Wrong Password");
-    }
+    await api.put("/admin", {
+      email: form.email,
+      newpassword: form.newpassword,
+    });
+    loading.value = false;
+    toast.success("Updated successfully!");
+    fetch();
   } catch (error) {
     loading.value = false;
     console.error(error);

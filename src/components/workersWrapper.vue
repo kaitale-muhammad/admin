@@ -13,19 +13,19 @@
 
         <template v-slot:default="{ isActive }">
           <v-card align-center>
-            <!-- <v-toolbar title="Add worker"></v-toolbar> -->
-            <!-- id, image, worker_id, name, date_of_birth, contact, email, date_joined, site -->
-
             <v-form @submit.prevent="submitForm" class="pa-4 form">
               <p>Photo</p>
               <input type="file" ref="file" @change="handleFileChange" /><br />
+
               <input
                 type="text"
                 v-model="form.worker_id"
                 placeholder="Worker ID"
                 name="id"
                 id="id"
+                required
               />
+
               <input
                 type="text"
                 v-model="form.name"
@@ -33,6 +33,7 @@
                 name="name"
                 required
               />
+
               <p>date of birth</p>
               <input
                 type="date"
@@ -41,26 +42,40 @@
                 name="dob"
                 required
               />
+
               <input
                 type="text"
                 v-model="form.contact"
                 placeholder="Contact"
-                name="name"
+                name="contact"
                 required
               />
+
               <input
                 type="email"
                 v-model="form.email"
                 placeholder="Email"
                 name="email"
+                required
               />
               <p>date joined</p>
-              <input
-                type="date"
-                v-model="form.date_joined"
-                placeholder="Date joined"
-                name="name"
-              />
+              <div id="title">
+                <input
+                  type="date"
+                  v-model="form.date_joined"
+                  placeholder="Date joined"
+                  name="date_joined"
+                  required
+                />
+
+                <input
+                  type="text"
+                  v-model="form.title"
+                  placeholder="Title"
+                  name="name"
+                  required
+                />
+              </div>
 
               <div class="form-row">
                 <input
@@ -70,7 +85,9 @@
                   name="cid"
                   id="cid"
                   style="width: auto; margin-right: 10px"
+                  required
                 />
+
                 <div class="supervisor-checkbox">
                   <p>Supervisor</p>
                   <div>
@@ -120,7 +137,7 @@
 input {
   width: 100%;
   padding: 10px;
-  border: 1px solid blue;
+  border: 1px blue;
   border-radius: 5px;
   outline: 1px solid blue;
   margin-bottom: 7px;
@@ -130,7 +147,7 @@ input {
 textarea {
   width: 100%;
   padding: 10px;
-  border: 1px solid blue;
+  border: 1px blue;
   border-radius: 5px;
   outline: 1px solid blue;
   margin-bottom: 10px;
@@ -156,21 +173,24 @@ textarea {
 .supervisor-checkbox p {
   margin: 0;
 }
-</style>
 
+div #title {
+  display: flex;
+}
+div #title input {
+  margin-left: 10px;
+}
+</style>
 <script setup>
-import axios from "axios";
-import { ref, reactive, onMounted, defineProps } from "vue";
+import api from "@/axios";
+import { ref, reactive, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { useToast } from "vue-toastification";
-// const loading = ref(true);
-// let data = ref(undefined);
+
 const loading = ref(false);
 const router = useRouter();
 const toast = useToast();
 
-const editing = false;
-// id, image, worker_id, name, date_of_birth, contact, email, date_joined, site
 const form = reactive({
   file: "",
   worker_id: "",
@@ -179,7 +199,9 @@ const form = reactive({
   contact: "",
   email: "",
   date_joined: "",
+  title: "",
   site: "",
+  supervisor: 0, // Default to 0 (unchecked)
 });
 
 onMounted(() => {
@@ -193,9 +215,23 @@ const handleFileChange = (event) => {
     filedata.value = file;
   }
 };
-// id, image, worker_id, name, date_of_birth, contact, email, date_joined, site
+
 const submitForm = async () => {
   loading.value = true;
+
+  // Check for required fields
+  if (
+    !form.worker_id ||
+    !form.name ||
+    !form.date_of_birth ||
+    !form.contact ||
+    !form.site
+  ) {
+    toast.error("All required fields must be filled!");
+    loading.value = false;
+    return;
+  }
+
   try {
     const formData = new FormData();
     formData.append("worker_id", form.worker_id);
@@ -205,24 +241,21 @@ const submitForm = async () => {
     formData.append("contact", form.contact);
     formData.append("email", form.email);
     formData.append("date_joined", form.date_joined);
+    formData.append("title", form.title);
     formData.append("site", form.site);
 
-    // Conditionally add the "supervisor" value
-    formData.append("supervisor", form.supervisor ? "1" : "");
+    // Convert supervisor to string before appending
+    formData.append("supervisor", form.supervisor ? "1" : "0");
 
     if (filedata.value) {
       formData.append("file", filedata.value);
     }
 
-    const response = await axios.post(
-      `http://localhost:5000/workers`,
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
-    );
+    const response = await api.post(`/workers`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
     loading.value = false;
     toast.success("Worker added successfully!");
     fetch();

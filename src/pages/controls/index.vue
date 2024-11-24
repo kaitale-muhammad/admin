@@ -4,7 +4,8 @@
     <v-card-title class="d-flex align-center pe-2">
       <v-icon
         icon="mdi-phone"
-        class="text-start font-weight-semibold text-primary"></v-icon>
+        class="text-start font-weight-semibold text-primary"
+      ></v-icon>
       &nbsp;&nbsp;&nbsp; FIND CONTROL ROOM&nbsp;&nbsp;&nbsp;&nbsp;
 
       <v-spacer></v-spacer>
@@ -17,7 +18,8 @@
         variant="solo-filled"
         flat
         hide-details
-        single-line></v-text-field>
+        single-line
+      ></v-text-field>
     </v-card-title>
 
     <v-divider></v-divider>
@@ -26,7 +28,8 @@
       :items="items"
       :items-per-page="6"
       :headers="headers"
-      hover>
+      hover
+    >
       <!-- control_id, name, contact -->
 
       <template #header.name>
@@ -52,7 +55,8 @@
               pa="7"
               color="red"
               class="icon"
-              @click="deleteControl(item.control_id)"></v-icon>
+              @click="deleteControl(item.control_id)"
+            ></v-icon>
           </div>
 
           <div class="edit">
@@ -69,7 +73,7 @@
 
 <script setup>
 import ControlWrapper from "@/components/controlWrapper.vue";
-import axios from "axios";
+import api from "@/axios";
 import { onMounted, ref, defineProps } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useToast } from "vue-toastification";
@@ -92,7 +96,7 @@ const headers = ref([
 
 const fetchData = async () => {
   try {
-    const response = await axios.get("http://localhost:5000/controls");
+    const response = await api.get("/controls");
     items.value = response.data;
   } catch (error) {
     console.error(error);
@@ -120,7 +124,7 @@ const deleteControl = async (control_id) => {
 
     // If the user confirms deletion, proceed
     if (result.isConfirmed) {
-      await axios.delete(`http://localhost:5000/controls/${control_id}`);
+      await api.delete(`/controls/${control_id}`);
       toast.success("Deleted successfully");
       fetchData(); // Reload or fetch updated data
     }

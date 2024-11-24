@@ -24,14 +24,18 @@ const router = createRouter({
 });
 
 // Authentication guard
+import Cookies from "js-cookie";
+
 router.beforeEach((to, from, next) => {
   const favicon = document.querySelector("link[rel='icon']");
   favicon.href = "/bglogo.png";
 
-  const isAuthenticated = !!localStorage.getItem("user"); // Check if user is authenticated
+  // Check if the auth_token cookie exists to determine if the user is authenticated
+  const isAuthenticated = !!Cookies.get("auth_token");
 
   if (to.path !== "/login" && !isAuthenticated) {
     next("/login"); // Redirect to login if not authenticated
+    router.push("/");
   } else {
     next(); // Proceed to route
   }
