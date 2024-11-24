@@ -45,7 +45,7 @@ const toast = useToast();
 const login = async () => {
   loading.value = true;
   try {
-    const response = await api.post("/admin", {
+    const response = await api.post("/adminlogin", {
       email: form.email,
       password: form.password,
     },
