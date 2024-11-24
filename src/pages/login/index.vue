@@ -45,32 +45,17 @@ const toast = useToast();
 const login = async () => {
   loading.value = true;
   try {
-    const response = await api.post("/adminlogin", {
-      email: form.email,
-      password: form.password,
-    },
-{ withCredentials: true }
-).then((response) => {
+    const response = await api.post('/adminlogin', { email, password })
+  .then((response) => {
     console.log('Login successful:', response.data);
   })
   .catch((error) => {
-    console.error('Error during login:', error);
+    console.error('Error during login:', error.response || error.message || error);
   });
+
     
   // console.log("Response from backend:", response.data);
 
-  //   axios
-  // .post(
-  //   'https://backendpsl.up.railway.app/admin',
-  //   { email, password },
-  //   { withCredentials: true } // Include cookies
-  // )
-  // .then((response) => {
-  //   console.log('Login successful:', response.data);
-  // })
-  // .catch((error) => {
-  //   console.error('Error during login:', error);
-  // });
 
 
     // Check if the backend sends a success message and token
