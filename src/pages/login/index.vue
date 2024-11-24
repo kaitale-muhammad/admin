@@ -47,7 +47,12 @@ const login = async () => {
   try {
     const response = await api.post('/adminlogin', {  
       email: form.email,
-      password: form.password, })
+      password: form.password,},
+   {
+    withCredentials: true, // Include cookies if needed
+    headers: { 'Content-Type': 'application/json' },
+  }
+                                   )
   .then((response) => {
     console.log('Login successful:', response.data);
   })
