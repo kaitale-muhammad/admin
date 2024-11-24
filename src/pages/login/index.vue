@@ -48,9 +48,30 @@ const login = async () => {
     const response = await api.post("/admin", {
       email: form.email,
       password: form.password,
-    });
+    },
+{ withCredentials: true }
+).then((response) => {
+    console.log('Login successful:', response.data);
+  })
+  .catch((error) => {
+    console.error('Error during login:', error);
+  });
+    
+  // console.log("Response from backend:", response.data);
 
-    // console.log("Response from backend:", response.data);
+  //   axios
+  // .post(
+  //   'https://backendpsl.up.railway.app/admin',
+  //   { email, password },
+  //   { withCredentials: true } // Include cookies
+  // )
+  // .then((response) => {
+  //   console.log('Login successful:', response.data);
+  // })
+  // .catch((error) => {
+  //   console.error('Error during login:', error);
+  // });
+
 
     // Check if the backend sends a success message and token
     if (response.status === 200 && response.data.token) {
