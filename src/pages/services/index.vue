@@ -64,7 +64,7 @@
       <template #item.image="{ item }">
         <v-card class="my-2 mx-auto elevation-2 rounded-lg" style="width: 80px">
           <v-img
-            :src="`https://backendpsl.up.railway.app/uploads/${item.image}`"
+            :src="`${baseUrl}/uploads/${item.image}`"
             width="80"
             height="80"
             class="rounded hover-image"
@@ -117,7 +117,7 @@
   <v-dialog v-model="imageDialog" max-width="500px">
     <v-card style="padding: 10px">
       <v-img
-        :src="`https://backendpsl.up.railway.app/uploads/${currentImage}`"
+        :src="`${baseUrl}/uploads/${currentImage}`"
         height="400px"
         width="100%"
       ></v-img>
@@ -132,7 +132,7 @@
 <script setup>
 import homeWraper from "@/components/homeWraper.vue";
 import { useDataStore } from "@/stores/dataStore";
-import api from "@/axios";
+import api, { baseUrl } from "@/axios";
 import { onMounted, ref, defineProps } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useToast } from "vue-toastification";
