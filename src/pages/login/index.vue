@@ -30,7 +30,8 @@
 <script setup>
 import { ref, reactive } from "vue";
 import { useRouter } from "vue-router";
-import api from "@/axios";
+import api, { baseUrl } from "@/axios";
+import axios from "axios";
 import { useToast } from "vue-toastification";
 import Cookies from "js-cookie"; // Import js-cookie
 
@@ -45,25 +46,29 @@ const toast = useToast();
 const login = async () => {
   loading.value = true;
   try {
-    const response = await api.post('/adminlogin', {  
-      email: form.email,
-      password: form.password,},
-   {
-    withCredentials: true, // Include cookies if needed
-    headers: { 'Content-Type': 'application/json' },
-  }
-                                   )
-  .then((response) => {
-    console.log('Login successful:', response.data);
-  })
-  .catch((error) => {
-    console.error('Error during login:', error.response || error.message || error);
-  });
+    const response = await axios
+      .post(
+        baseUrl + "/adminlogin",
+        {
+          email: form.email,
+          password: form.password,
+        },
+        {
+          withCredentials: true, // Include cookies if needed
+          headers: { "Content-Type": "application/json" },
+        }
+      )
+      .then((response) => {
+        console.log("Login successful:", response.data);
+      })
+      .catch((error) => {
+        console.error(
+          "Error during login:",
+          error.response || error.message || error
+        );
+      });
 
-    
-  // console.log("Response from backend:", response.data);
-
-
+    // console.log("Response from backend:", response.data);
 
     // Check if the backend sends a success message and token
     if (response.status === 200 && response.data.token) {

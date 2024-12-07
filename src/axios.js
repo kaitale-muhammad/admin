@@ -4,5 +4,5 @@ import axios from "axios";
 const api = axios.create({
   baseURL: "backend-production-2194.up.railway.app", // https://backendpsl.up.railway.app/
 });
-
+export const baseURL = "backend-production-2194.up.railway.app";
 export default api;
