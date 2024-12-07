@@ -46,32 +46,22 @@ const toast = useToast();
 const login = async () => {
   loading.value = true;
   try {
-    const response = await axios
-      .post(
-        baseUrl + "/adminlogin",
-        {
-          email: form.email,
-          password: form.password,
-        },
-        {
-          withCredentials: true, // Include cookies if needed
-          headers: { "Content-Type": "application/json" },
-        }
-      )
-      .then((response) => {
-        console.log("Login successful:", response.data);
-      })
-      .catch((error) => {
-        console.error(
-          "Error during login:",
-          error.response || error.message || error
-        );
-      });
+    const response = await axios.post(
+      baseUrl + "/adminlogin",
+      {
+        email: form.email,
+        password: form.password,
+      },
+      {
+        withCredentials: true, // Include cookies if needed
+        headers: { "Content-Type": "application/json" },
+      }
+    );
 
     // console.log("Response from backend:", response.data);
 
     // Check if the backend sends a success message and token
-    if (response.status === 200 && response.data.token) {
+    if (response.status === 200 && response?.data?.token) {
       const user = { email: form.email, token: response.data.token };
       Cookies.set("auth_token", response.data.token, { expires: 1 });
 
